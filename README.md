@@ -8,22 +8,22 @@ Reto para practicar las habilidades de un desarrollador fullstack moderno.
 ## 🇪🇸 Menú de contenido
 
 ### Instrucciones en Español
-- 🇪🇸 [Enunciado](#es-enunciado)
-- 🇪🇸 [Funcionalidades](#es-funcionalidades)
-- 🇪🇸 [Tecnologías Requeridas](#es-tecnologías-requeridas)
-- 🇪🇸 [Instrucciones Paso a Paso](#es-instrucciones-paso-a-paso)
-- 🇪🇸 [Tips Importantes](#es-tips-importantes)
-- 🇪🇸 [Información de Interés](#es-información-de-interés)
-- 🇪🇸 [Instrucciones de uso](#es-instrucciones-de-uso)
+- [Enunciado](#es-enunciado)
+- [Funcionalidades](#es-funcionalidades)
+- [Tecnologías Requeridas](#es-tecnologías-requeridas)
+- [Instrucciones Paso a Paso](#es-instrucciones-paso-a-paso)
+- [Tips Importantes](#es-tips-importantes)
+- [Información de Interés](#es-información-de-interés)
+- [Instrucciones de uso](#es-instrucciones-de-uso)
 
 ### English Menu of Contents
-- 🇬🇧 [Statement](#en-statement)
-- 🇬🇧 [Features](#en-features)
-- 🇬🇧 [Required Technologies](#en-required-technologies)
-- 🇬🇧 [Step by Step Instructions](#en-step-by-step-instructions)
-- 🇬🇧 [Important Tips](#en-important-tips)
-- 🇬🇧 [Resources](#en-resources)
-- 🇬🇧 [How to use](#en-how-to-use)
+- [Statement](#en-statement)
+- [Features](#en-features)
+- [Required Technologies](#en-required-technologies)
+- [Step by Step Instructions](#en-step-by-step-instructions)
+- [Important Tips](#en-important-tips)
+- [Resources](#en-resources)
+- [How to use](#en-how-to-use)
 
 ---
 
@@ -629,7 +629,7 @@ Reusing code from the internet is allowed, citing sources. The work is individua
 ✅ **Firebase es bonus**: Enfócate primero en que todo funcione con localStorage.
 
 ## Información de Interés
-
+- **Videos de React**: [Lista de reproducción de la clase](https://www.youtube.com/watch?v=YEe_VLjWAeY&list=PLQ1ShaTNqthJHS5mDcxoR1Z68ljLDYm-A)
 - **Documentación de React**: https://react.dev/
 - **Tailwind CSS**: https://tailwindcss.com/
 - **Zustand (State Management)**: https://zustand.docs.pmnd.rs/
