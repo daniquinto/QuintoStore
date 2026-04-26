@@ -32,11 +32,12 @@ export const registerFullUser = async (userData) => {
         const user = userCredential.user;
 
         // 2. Guardar en Firestore usando el UID obtenido
+        // Ahora guardamos una lista de direcciones (addresses) en lugar de un string
         await setDoc(doc(db, "users", user.uid), {
             name: userData.name,
             email: userData.email,
             cellphone: userData.cellphone,
-            address: userData.address,
+            addresses: [userData.address], // Initialize with the registration address
             createdAt: new Date()
         });
 
