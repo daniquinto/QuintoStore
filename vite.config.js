@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: "/Mystore/", // Repository name for GitHub Pages deployment
+  base: "/QuintoStore/", // Repository name (updated per GitHub redirection)
 })
