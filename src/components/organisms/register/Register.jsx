@@ -3,13 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { registerFullUser } from "../../../firebase/auth";
 import axios from 'axios';
 
-// Phone validation rules by prefix with flags
+// Phone validation rules by prefix with flags and placeholders
 const PHONE_RULES = {
-  '+57': { flag: '🇨🇴', regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)' },
-  '+1': { flag: '🇺🇸', regex: /^[0-9]{10}$/, label: '10 digits' },
-  '+34': { flag: '🇪🇸', regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)' },
-  '+52': { flag: '🇲🇽', regex: /^[0-9]{10}$/, label: '10 dígitos' },
-  '+54': { flag: '🇦🇷', regex: /^[0-9]{10}$/, label: '10 dígitos' },
+  '+57': { flag: '🇨🇴', regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)', placeholder: '3001234567' },
+  '+1': { flag: '🇺🇸', regex: /^[0-9]{10}$/, label: '10 digits', placeholder: '2025550123' },
+  '+34': { flag: '🇪🇸', regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)', placeholder: '612345678' },
+  '+52': { flag: '🇲🇽', regex: /^[0-9]{10}$/, label: '10 dígitos', placeholder: '5512345678' },
+  '+54': { flag: '🇦🇷', regex: /^[0-9]{10}$/, label: '10 dígitos', placeholder: '1112345678' },
 };
 
 const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors, prefix = null }) => (
@@ -258,7 +258,7 @@ const Register = () => {
                   value={formData.cellphone}
                   onChange={handleChange}
                   className={`input-mf ${errors.cellphone ? 'border-mf-red' : ''}`}
-                  placeholder="3001234567"
+                  placeholder={PHONE_RULES[formData.phonePrefix]?.placeholder || "1234567890"}
                 />
               </div>
               {errors.cellphone && (
