@@ -6,20 +6,23 @@ const useCartStore = create(
     (set, get) => ({
       items: [],
 
-      addItem: (product, quantity) => {
+      addItem: (product, quantity = 1) => {
         const items = get().items;
         const existing = items.find(item => item.product.id === product.id);
         
+        // Ensure quantity is a valid number
+        const qtyToAdd = Number(quantity) || 1;
+
         if (existing) {
           set({
             items: items.map(item =>
               item.product.id === product.id
-                ? { ...item, quantity: item.quantity + quantity }
+                ? { ...item, quantity: item.quantity + qtyToAdd }
                 : item
             )
           });
         } else {
-          set({ items: [...items, { product, quantity }] });
+          set({ items: [...items, { product, quantity: qtyToAdd }] });
         }
       },
 
@@ -30,20 +33,24 @@ const useCartStore = create(
       updateQuantity: (id, quantity) => {
         set({
           items: get().items.map(item =>
-            item.product.id === id ? { ...item, quantity } : item
+            item.product.id === id ? { ...item, quantity: Number(quantity) || 1 } : item
           )
         });
       },
 
       clearCart: () => set({ items: [] }),
 
-      getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
+      getTotalItems: () => get().items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0),
 
       getTotalPrice: () =>
-        get().items.reduce((sum, item) => sum + parseFloat(item.product.price) * item.quantity, 0),
+        get().items.reduce((sum, item) => {
+          const price = parseFloat(item.product.price) || 0;
+          const quantity = Number(item.quantity) || 0;
+          return sum + (price * quantity);
+        }, 0),
     }),
     {
-      name: 'cart-storage', // name of the item in the storage (must be unique)
+      name: 'cart-storage',
     }
   )
 );
