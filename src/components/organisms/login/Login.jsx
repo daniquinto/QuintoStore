@@ -31,24 +31,19 @@ const Login = () => {
 
   return (
     <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
-      <div className="max-w-4xl w-full mx-4 flex flex-col md:flex-row quinto-card overflow-hidden h-[600px]">
-        {/* Left Side - Visual */}
-        <div className="md:w-1/2 bg-quinto-900 p-16 text-white flex flex-col justify-between relative">
-          <div className="absolute top-0 left-0 w-full h-full bg-quinto-500/10 blur-[80px] rounded-full translate-x-[-50%] translate-y-[-50%]"></div>
-          <div className="relative z-10">
-            <span className="text-quinto-400 text-[10px] font-black uppercase tracking-[0.4em]">WELCOME TO QUINTO</span>
-            <h2 className="text-5xl font-black tracking-tighter mt-6 leading-tight uppercase">EXPERIENCE<br />QUALITY.</h2>
-          </div>
-          <div className="relative z-10">
-            <p className="text-xs font-bold uppercase tracking-widest text-quinto-300">Quinto Store © 2026</p>
-          </div>
-        </div>
-
-        {/* Right Side - Form */}
-        <div className="md:w-1/2 p-16 bg-white flex flex-col justify-center">
-          <div className="mb-12">
-            <h1 className="text-3xl font-black tracking-tight text-quinto-900 uppercase">Sign In</h1>
-            <p className="text-xs font-bold text-quinto-400 uppercase tracking-widest mt-2">Access your premium dashboard</p>
+      <div className="max-w-md w-full mx-4 quinto-card p-12 bg-white relative overflow-hidden">
+        {/* Subtle Decorative Element */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-quinto-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
+        
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-quinto-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-quinto-900/10">
+              <svg className="w-8 h-8 text-quinto-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-black tracking-tighter text-quinto-900 uppercase">Welcome Back</h1>
+            <p className="text-xs font-bold text-quinto-400 uppercase tracking-[0.3em] mt-2">Sign in to Quinto Store</p>
           </div>
 
           {error && (
@@ -87,7 +82,7 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" disabled={loading} className="w-full quinto-btn-primary py-4 mt-6">
+            <button type="submit" disabled={loading} className="w-full quinto-btn-primary py-4 shadow-xl shadow-quinto-900/10 mt-6">
               {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : 'SIGN IN'}
             </button>
           </form>

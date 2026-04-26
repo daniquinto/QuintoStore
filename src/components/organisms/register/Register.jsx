@@ -200,31 +200,19 @@ const Register = () => {
 
   return (
     <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
-      <div className="max-w-4xl w-full mx-4 flex flex-col md:flex-row quinto-card overflow-hidden">
-        {/* Left Side - Visual */}
-        <div className="md:w-5/12 bg-quinto-900 p-12 text-white flex flex-col justify-between relative">
-          <div className="absolute top-0 left-0 w-full h-full bg-quinto-500/10 blur-[80px] rounded-full translate-x-[-50%] translate-y-[-50%]"></div>
-          <div className="relative z-10">
-            <span className="text-quinto-400 text-[10px] font-black uppercase tracking-[0.4em]">QUINTO STORE</span>
-            <h2 className="text-4xl font-black tracking-tighter mt-4 leading-tight">JOIN THE<br />SELECT.</h2>
-          </div>
-          <div className="space-y-4 relative z-10">
-             <div className="flex gap-3">
-               <div className="w-5 h-5 rounded-full bg-quinto-500/20 flex items-center justify-center text-quinto-400 text-[10px]">✓</div>
-               <p className="text-xs font-medium opacity-70">Premium member benefits</p>
-             </div>
-             <div className="flex gap-3">
-               <div className="w-5 h-5 rounded-full bg-quinto-500/20 flex items-center justify-center text-quinto-400 text-[10px]">✓</div>
-               <p className="text-xs font-medium opacity-70">Secured worldwide access</p>
-             </div>
-          </div>
-        </div>
-
-        {/* Right Side - Form */}
-        <div className="md:w-7/12 p-12 bg-white">
-          <div className="mb-10">
-            <h1 className="text-2xl font-black tracking-tight text-quinto-900">CREATE ACCOUNT</h1>
-            <p className="text-xs font-bold text-quinto-400 uppercase tracking-widest mt-1">Experience Quinto Excellence</p>
+      <div className="max-w-2xl w-full mx-4 quinto-card p-12 bg-white relative overflow-hidden">
+        {/* Subtle Decorative Element */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-quinto-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
+        
+        <div className="relative z-10">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-quinto-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-quinto-900/10">
+              <svg className="w-8 h-8 text-quinto-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-black tracking-tighter text-quinto-900 uppercase">Create Account</h1>
+            <p className="text-xs font-bold text-quinto-400 uppercase tracking-[0.3em] mt-2">Join Quinto Store</p>
           </div>
 
           {apiError && (
@@ -243,7 +231,7 @@ const Register = () => {
               <div className="space-y-2">
                 <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-quinto-600">Cellphone</label>
                 <div className="flex">
-                  <select name="phonePrefix" value={formData.phonePrefix} onChange={handleChange} className="quinto-input !py-3 !px-3 !w-24 rounded-r-none bg-quinto-50 border-r-0 text-quinto-900 font-bold">
+                  <select name="phonePrefix" value={formData.phonePrefix} onChange={handleChange} className="quinto-input !py-3 !px-3 !w-24 rounded-r-none bg-slate-50 border-r-0 text-quinto-900 font-bold">
                     {Object.entries(PHONE_RULES).map(([pref, rule]) => (
                       <option key={pref} value={pref}>{rule.flag} {pref}</option>
                     ))}
@@ -254,10 +242,8 @@ const Register = () => {
               </div>
             </div>
 
-            <div className="pt-8 border-t border-quinto-50">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900">Delivery (Colombia)</h3>
-              </div>
+            <div className="pt-8 border-t border-slate-100">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900 mb-6 text-center">Shipping (Colombia Only)</h3>
               <div className="grid grid-cols-2 gap-6">
                 <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
                 <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
@@ -267,17 +253,17 @@ const Register = () => {
               </div>
             </div>
 
-            <div className="pt-8 border-t border-quinto-50 grid grid-cols-2 gap-6">
+            <div className="pt-8 border-t border-slate-100 grid grid-cols-2 gap-6">
               <InputGroup label="Password" name="password" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
               <InputGroup label="Confirm" name="confirmPassword" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
             </div>
 
-            <button type="submit" disabled={loading} className="w-full quinto-btn-primary py-4">
+            <button type="submit" disabled={loading} className="w-full quinto-btn-primary py-4 shadow-xl shadow-quinto-900/10 mt-4">
               {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : 'REGISTER NOW'}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-xs text-quinto-400 font-bold uppercase tracking-widest">
+          <p className="mt-10 text-center text-xs text-quinto-400 font-bold uppercase tracking-widest">
             Already have an account? <Link to="/login" className="text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all ml-1">Login</Link>
           </p>
         </div>
