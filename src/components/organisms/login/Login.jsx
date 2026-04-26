@@ -1,16 +1,21 @@
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import useUserStore from '../../../store/userStore';
 import { loginUser } from '../../../firebase/auth';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Check if there's a redirect parameter
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTo = searchParams.get('redirect');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,8 +27,12 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await loginUser(formData.email, formData.password);
-      if (result.success) navigate('/gallery');
-      else setError(result.error);
+      if (result.success) {
+        // Redirect to intended page or gallery
+        navigate(redirectTo ? `/${redirectTo}` : '/gallery');
+      } else {
+        setError(result.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -32,7 +41,6 @@ const Login = () => {
   return (
     <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
       <div className="max-w-md w-full mx-4 quinto-card p-12 bg-white relative overflow-hidden">
-        {/* Subtle Decorative Element */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-quinto-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
         
         <div className="relative z-10">
@@ -42,7 +50,9 @@ const Login = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-black tracking-tighter text-quinto-900 uppercase">Welcome Back</h1>
+            <h1 className="text-3xl font-black tracking-tighter text-quinto-900 uppercase">
+              {redirectTo === 'checkout' ? 'Login to Purchase' : 'Welcome Back'}
+            </h1>
             <p className="text-xs font-bold text-quinto-400 uppercase tracking-[0.3em] mt-2">Sign in to Quinto Store</p>
           </div>
 
@@ -90,7 +100,7 @@ const Login = () => {
           <div className="mt-12 text-center">
             <p className="text-xs text-quinto-400 font-bold uppercase tracking-widest leading-loose">
               Not a member yet?<br />
-              <Link to="/register" className="text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all">Create Account</Link>
+              <Link to={`/register${redirectTo ? '?redirect='+redirectTo : ''}`} className="text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all">Create Account</Link>
             </p>
           </div>
         </div>
