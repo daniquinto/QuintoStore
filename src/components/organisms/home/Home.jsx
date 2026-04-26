@@ -18,7 +18,7 @@ const Home = () => {
 
   const categories = [
     { name: "Electronics", slug: "electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=500&auto=format&fit=crop" },
-    { name: "Jewelry", slug: "jewelry", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce33e?q=80&w=500&auto=format&fit=crop" },
+    { name: "Jewelry", slug: "jewelery", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce33e?q=80&w=500&auto=format&fit=crop" },
     { name: "Men's Fashion", slug: "men's clothing", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=500&auto=format&fit=crop" },
     { name: "Women's Fashion", slug: "women's clothing", image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=500&auto=format&fit=crop" },
   ];

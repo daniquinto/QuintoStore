@@ -4,6 +4,12 @@ import useProductStore from "../../../store/productStore";
 
 const ITEMS_PER_PAGE = 8;
 
+const formatCategoryName = (slug) => {
+  if (!slug) return '';
+  if (slug === 'jewelery') return 'Jewelry';
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+};
+
 const ProductGallery = () => {
   const { 
     filteredProducts, 
@@ -56,7 +62,7 @@ const ProductGallery = () => {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <span className="text-quinto-400 text-[11px] font-black uppercase tracking-[0.4em] mb-4 block">Official Catalog</span>
           <h1 className="text-5xl font-black tracking-tighter leading-[0.9] uppercase">
-            {selectedCategory ? `Browsing: ${selectedCategory}` : 'Full Collection'}
+            {selectedCategory ? `Browsing: ${formatCategoryName(selectedCategory)}` : 'Full Collection'}
           </h1>
         </div>
       </section>
@@ -70,9 +76,9 @@ const ProductGallery = () => {
             {selectedCategory && (
               <button 
                 onClick={() => setSelectedCategory('')}
-                className="bg-quinto-50 text-quinto-800 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-2 hover:bg-quinto-900 hover:text-white transition-all"
+                className="bg-quinto-50 text-quinto-800 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-2 hover:bg-quinto-900 hover:text-white transition-all border border-quinto-100"
               >
-                {selectedCategory}
+                {formatCategoryName(selectedCategory)}
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             )}

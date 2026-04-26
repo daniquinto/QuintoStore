@@ -4,6 +4,12 @@ import useProductStore from '../../../store/productStore';
 import { imageMap } from '../../../assets/imageMap';
 import useCartStore from '../../../store/cartStore';
 
+const formatCategory = (category) => {
+  if (!category) return '';
+  if (category === 'jewelery') return 'Jewelry';
+  return category.charAt(0).toUpperCase() + category.slice(1);
+};
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -57,7 +63,7 @@ export default function ProductDetail() {
             <span className="text-quinto-300">/</span>
             <span className="text-quinto-600 cursor-pointer hover:text-quinto-900" onClick={() => navigate('/gallery')}>Collection</span>
             <span className="text-quinto-300">/</span>
-            <span className="text-quinto-900">{product.category}</span>
+            <span className="text-quinto-900">{formatCategory(product.category)}</span>
           </div>
         </div>
       </div>
@@ -149,7 +155,7 @@ export default function ProductDetail() {
                </div>
                <div className="flex flex-col">
                  <span className="text-[9px] font-black text-quinto-400 uppercase tracking-widest">Collection</span>
-                 <span className="text-xs font-bold text-quinto-900 uppercase">{product.category}</span>
+                 <span className="text-xs font-bold text-quinto-900 uppercase">{formatCategory(product.category)}</span>
                </div>
             </div>
           </div>

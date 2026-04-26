@@ -1,6 +1,11 @@
 import { imageMap } from "../../assets/imageMap";
 import { Link } from "react-router-dom";
 
+const formatCategory = (category) => {
+  if (category === 'jewelery') return 'Jewelry';
+  return category.charAt(0).toUpperCase() + category.slice(1);
+};
+
 function ProductCard({ product }) {
   const resolvedImage = imageMap[product.image] ?? product.image;
   const rating = product.rating?.rate || product.rate || 0;
@@ -33,7 +38,7 @@ function ProductCard({ product }) {
       <div className="p-6 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
           <p className="text-[10px] font-black uppercase tracking-widest text-quinto-600">
-            {product.category}
+            {formatCategory(product.category)}
           </p>
           <div className="flex items-center gap-1">
             <svg className="w-3 h-3 text-quinto-500 fill-quinto-500" viewBox="0 0 20 20">
