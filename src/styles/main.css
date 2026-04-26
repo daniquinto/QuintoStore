@@ -19,6 +19,9 @@
 }
 
 @layer base {
+  html, body {
+    @apply overflow-x-hidden scroll-smooth;
+  }
   body {
     /* Using a warmer, darker canvas or white for high contrast */
     @apply text-quinto-950 font-ubuntu bg-white antialiased;

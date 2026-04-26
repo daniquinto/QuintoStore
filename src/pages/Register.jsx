@@ -199,8 +199,8 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
-      <div className="max-w-2xl w-full mx-4 quinto-card p-12 bg-white relative overflow-hidden">
+    <div className="bg-quinto-50/30 min-h-screen py-10 md:py-24 flex items-center justify-center">
+      <div className="max-w-2xl w-full mx-4 quinto-card p-6 sm:p-12 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-quinto-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
         
         <div className="relative z-10">
@@ -243,16 +243,16 @@ const Register = () => {
 
             <div className="pt-8 border-t border-slate-100">
               <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900 mb-6 text-center">Shipping (Colombia Support)</h3>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
                 <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <InputGroup label="Address Details" name="addressDetails" placeholder="100 Street # 15 - 20" formData={formData} handleChange={handleChange} errors={errors} />
                 </div>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-slate-100 grid grid-cols-2 gap-6">
+            <div className="pt-8 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-6">
               <InputGroup label="Password" name="password" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
               <InputGroup label="Confirm" name="confirmPassword" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
             </div>

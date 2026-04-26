@@ -199,7 +199,7 @@ const Checkout = () => {
                 <div className="animate-fade-in bg-quinto-50/50 p-10 rounded-[2.5rem] border-2 border-quinto-100 border-dashed space-y-8">
                   <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-900 mb-2">New Shipping Detail</h3>
                   
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-quinto-400">Department</label>
                       <select 
@@ -223,7 +223,7 @@ const Checkout = () => {
                         {filteredCities.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
-                    <div className="col-span-2 space-y-2">
+                    <div className="md:col-span-2 space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-quinto-400">Street Address & Details</label>
                       <input 
                         type="text"

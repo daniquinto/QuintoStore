@@ -85,20 +85,20 @@ export default function Profile() {
       <div className="bg-quinto-950 text-white pt-32 pb-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-quinto-500/10 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="flex flex-col md:flex-row items-center gap-10">
-            <div className="w-32 h-32 rounded-3xl bg-quinto-800 flex items-center justify-center border-4 border-white/10 shadow-2xl">
-              <span className="text-5xl font-black text-quinto-400 italic">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl md:rounded-3xl bg-quinto-800 flex items-center justify-center border-4 border-white/10 shadow-2xl">
+              <span className="text-4xl md:text-5xl font-black text-quinto-400 italic">
                 {(user.name || user.email)?.charAt(0).toUpperCase()}
               </span>
             </div>
             <div className="flex-1 text-center md:text-left">
-              <span className="text-quinto-400 text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Premium Client</span>
-              <h1 className="text-5xl font-black tracking-tighter uppercase leading-none mb-4">
+              <span className="text-quinto-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-2 block">Premium Client</span>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none mb-4 break-words">
                 {user.name || 'Quinto Client'}
               </h1>
-              <p className="text-quinto-200 font-bold text-xs uppercase tracking-widest opacity-60">{user.email}</p>
+              <p className="text-quinto-200 font-bold text-[10px] md:text-xs uppercase tracking-widest opacity-60">{user.email}</p>
             </div>
-            <button onClick={handleLogout} className="quinto-btn-outline !border-white/20 !text-white hover:!bg-white hover:!text-quinto-900 h-14">
+            <button onClick={handleLogout} className="w-full md:w-auto quinto-btn-outline !border-white/20 !text-white hover:!bg-white hover:!text-quinto-900 h-12 md:h-14">
               Logout
             </button>
           </div>
@@ -171,28 +171,28 @@ export default function Profile() {
             {orders.length > 0 ? (
               <div className="space-y-6">
                 {orders.map((order) => (
-                  <div key={order.id} className="quinto-card p-8 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-4">
-                        <span className="bg-quinto-900 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                  <div key={order.id} className="quinto-card p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8">
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-4">
+                        <span className="bg-quinto-900 text-white text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                           QT-{order.id.slice(-6).toUpperCase()}
                         </span>
-                        <span className="text-[10px] font-bold text-quinto-400 uppercase tracking-widest">
+                        <span className="text-[9px] md:text-[10px] font-bold text-quinto-400 uppercase tracking-widest">
                           {order.createdAt?.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
                       </div>
                       <div className="space-y-1">
                         {order.items.map((item, idx) => (
-                          <p key={idx} className="text-xs font-bold text-quinto-600 uppercase tracking-tight">
+                          <p key={idx} className="text-[11px] md:text-xs font-bold text-quinto-600 uppercase tracking-tight">
                             {item.name} <span className="opacity-40">x{item.quantity}</span>
                           </p>
                         ))}
                       </div>
-                      <p className="mt-4 text-[9px] font-black text-quinto-300 uppercase tracking-widest">Shipped to: <span className="text-quinto-500">{order.shippingAddress || 'Default Address'}</span></p>
+                      <p className="mt-4 text-[8px] md:text-[9px] font-black text-quinto-300 uppercase tracking-widest leading-relaxed">Shipped to: <span className="text-quinto-500">{order.shippingAddress || 'Default Address'}</span></p>
                     </div>
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <p className="text-2xl font-black text-quinto-950">${order.total?.toFixed(2)}</p>
-                      <span className="text-[9px] font-black text-green-600 uppercase tracking-[0.2em] bg-green-50 px-3 py-1 rounded-lg">Cash on Delivery</span>
+                    <div className="flex flex-row md:flex-col justify-between md:justify-end items-center md:items-end w-full md:w-auto gap-2 shrink-0 pt-4 md:pt-0 border-t md:border-none border-quinto-50">
+                      <p className="text-xl md:text-2xl font-black text-quinto-950">${order.total?.toFixed(2)}</p>
+                      <span className="text-[8px] md:text-[9px] font-black text-green-600 uppercase tracking-[0.2em] bg-green-50 px-3 py-1 rounded-lg">Paid COD</span>
                     </div>
                   </div>
                 ))}

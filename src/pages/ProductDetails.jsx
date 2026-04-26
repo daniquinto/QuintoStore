@@ -58,7 +58,7 @@ export default function ProductDetails() {
       {/* Navigation Breadcrumb */}
       <div className="bg-quinto-50/50 py-8 border-b border-quinto-100">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em]">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest md:tracking-[0.2em]">
             <span className="text-quinto-600 cursor-pointer hover:text-quinto-900" onClick={() => navigate('/')}>Home</span>
             <span className="text-quinto-300">/</span>
             <span className="text-quinto-600 cursor-pointer hover:text-quinto-900" onClick={() => navigate('/gallery')}>Collection</span>
@@ -92,7 +92,7 @@ export default function ProductDetails() {
           <div className="lg:w-1/2 flex flex-col">
             <div className="mb-8">
               <span className="text-quinto-500 text-xs font-black uppercase tracking-[0.3em] mb-4 block">Premium Piece</span>
-              <h1 className="text-4xl md:text-5xl font-black text-quinto-900 tracking-tighter uppercase leading-[0.95] mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-quinto-900 tracking-tighter uppercase leading-[0.95] mb-6 break-words">
                 {product.title}
               </h1>
               
