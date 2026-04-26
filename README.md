@@ -1,4 +1,4 @@
-# Fullstack Challenge - E-commerce (Quinto Store)
+# E-commerce (Quinto Store)
 
 ## General Information
 **Project Name**: Quinto Store - E-commerce  
