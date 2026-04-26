@@ -35,7 +35,31 @@ The project follows a modular structure based on Atomic Design for maximum scala
 - **src/components/templates**: Page structures (Main Layout).
 - **src/pages**: Assembled application views.
 
-### Technologies and Tools
+#---
+
+## Data Model (Firestore)
+The application uses a NoSQL structure in Cloud Firestore with the following main collections:
+
+### `users` Collection
+- `name`: Full name of the user.
+- `email`: Registration email.
+- `cellphone`: Contact number.
+- `addresses`: Array of strings containing multiple shipping addresses.
+- `createdAt`: Registration timestamp.
+
+### `orders` Collection
+- `userId`: Reference to the user who placed the order.
+- `customerName`: Cached name of the customer.
+- `shippingAddress`: Selected address for this specific order.
+- `items`: Array of products (id, name, price, quantity).
+- `total`: Final order price.
+- `paymentMethod`: "Cash on Delivery".
+- `status`: Order state (e.g., "Confirmed").
+- `createdAt`: Purchase timestamp.
+
+---
+
+## Technologies and Tools
 - **React.js** (Vite)
 - **Zustand**: Global state management (User, Cart, Products).
 - **React Router Dom**: SPA Navigation.
