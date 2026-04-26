@@ -3,7 +3,7 @@ import useCartStore from '../store/cartStore';
 import useUserStore from '../store/userStore';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import app from '../firebase/firebase.config';
+import app from '../firebase/firebase.config.js';
 import axios from 'axios';
 
 const Checkout = () => {

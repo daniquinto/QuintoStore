@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToAuthChanges, logoutUser } from '../firebase/auth';
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import app from '../firebase/firebase.config';
+import app from '../firebase/firebase.config.js';
 
 export default function Profile() {
   const navigate = useNavigate();
