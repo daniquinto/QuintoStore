@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerFullUser } from "../../../firebase/auth";
-import { colombiaData } from "../../../mockdata/colombiaData";
+import axios from 'axios';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -17,12 +17,59 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // States for API data
+  const [departments, setDepartments] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
 
-  const departments = Object.keys(colombiaData);
-  const cities = formData.department ? colombiaData[formData.department] : [];
+  // Fetch Colombia Data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [deptRes, cityRes] = await Promise.all([
+          axios.get('https://api-colombia.com/api/v1/Department'),
+          axios.get('https://api-colombia.com/api/v1/City')
+        ]);
+        
+        // Sort alphabetically
+        setDepartments(deptRes.data.sort((a, b) => a.name.localeCompare(b.name)));
+        setAllCities(cityRes.data);
+      } catch (err) {
+        console.error("Error fetching Colombia API data:", err);
+        setError("Error al cargar datos de Colombia. Por favor recarga la página.");
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Filter cities when department changes
+  useEffect(() => {
+    if (formData.department) {
+      const deptId = departments.find(d => d.name === formData.department)?.id;
+      if (deptId) {
+        const filtered = allCities
+          .filter(city => city.departmentId === deptId)
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setFilteredCities(filtered);
+      }
+    } else {
+      setFilteredCities([]);
+    }
+  }, [formData.department, departments, allCities]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // 1. Cellphone numeric restriction
+    if (name === 'cellphone') {
+      const onlyNums = value.replace(/[^0-9]/g, '');
+      if (onlyNums.length <= 10) {
+        setFormData(prev => ({ ...prev, [name]: onlyNums }));
+      }
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -36,22 +83,20 @@ const Register = () => {
   };
 
   const validateColombianPhone = (phone) => {
-    // Basic Colombian mobile: 10 digits starting with 3
-    return /^3[0-9]{9}$/.test(phone.replace(/\s/g, ''));
+    return /^3[0-9]{9}$/.test(phone);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
-    // Basic Validations
     if (!validateEmail(formData.email)) {
       setError('Por favor ingresa un correo electrónico válido.');
       return;
     }
 
     if (!validateColombianPhone(formData.cellphone)) {
-      setError('Por favor ingresa un número de celular colombiano válido (10 dígitos, empieza por 3).');
+      setError('El celular debe ser de 10 dígitos y empezar por 3.');
       return;
     }
 
@@ -79,18 +124,14 @@ const Register = () => {
         address: fullAddress
       };
 
-      console.log("Iniciando registro para:", submissionData.email);
       const respuesta = await registerFullUser(submissionData);
 
       if (respuesta.success) {
-        console.log("Registro exitoso");
         navigate('/login');
       } else {
-        console.error("Error en registro:", respuesta.error);
         setError(`Error: ${respuesta.error}`);
       }
     } catch (err) {
-      console.error("Excepción en el formulario:", err);
       setError('Ocurrió un error inesperado. Por favor intenta de nuevo.');
     } finally {
       setLoading(false);
@@ -117,13 +158,12 @@ const Register = () => {
         </div>
 
         {error && (
-          <div className="mb-8 p-4 bg-mf-red/10 border-l-4 border-mf-red text-mf-red text-xs font-bold uppercase tracking-widest animate-pulse">
+          <div className="mb-8 p-4 bg-mf-red/10 border-l-4 border-mf-red text-mf-red text-xs font-bold uppercase tracking-widest">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Info Personal */}
           <div className="md:col-span-2">
             <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Full Name</label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-mf" placeholder="John Doe" required />
@@ -135,26 +175,47 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Cellphone (Colombia)</label>
-            <input type="text" name="cellphone" value={formData.cellphone} onChange={handleChange} className="input-mf" placeholder="300 123 4567" required />
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Cellphone (10 digits)</label>
+            <input 
+              type="text" 
+              name="cellphone" 
+              value={formData.cellphone} 
+              onChange={handleChange} 
+              className="input-mf" 
+              placeholder="3001234567" 
+              required 
+            />
           </div>
 
-          {/* Dirección Mejorada */}
+          {/* Dirección Dinámica */}
           <div className="md:col-span-2 border-t border-mf-gray pt-8 mt-4">
             <h3 className="text-sm font-black uppercase tracking-widest text-mf-black mb-6">Shipping Address</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Department</label>
-                <select name="department" value={formData.department} onChange={handleChange} className="input-mf appearance-none bg-white" required>
+                <select 
+                  name="department" 
+                  value={formData.department} 
+                  onChange={handleChange} 
+                  className="input-mf appearance-none bg-white" 
+                  required
+                >
                   <option value="">Select Department</option>
-                  {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
+                  {departments.map(dept => <option key={dept.id} value={dept.name}>{dept.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">City</label>
-                <select name="city" value={formData.city} onChange={handleChange} className="input-mf appearance-none bg-white" required disabled={!formData.department}>
+                <select 
+                  name="city" 
+                  value={formData.city} 
+                  onChange={handleChange} 
+                  className="input-mf appearance-none bg-white" 
+                  required 
+                  disabled={!formData.department}
+                >
                   <option value="">Select City</option>
-                  {cities.map(city => <option key={city} value={city}>{city}</option>)}
+                  {filteredCities.map(city => <option key={city.id} value={city.name}>{city.name}</option>)}
                 </select>
               </div>
               <div className="md:col-span-2">
@@ -164,7 +225,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Seguridad */}
           <div className="md:col-span-2 border-t border-mf-gray pt-8 mt-4">
             <h3 className="text-sm font-black uppercase tracking-widest text-mf-black mb-6">Security</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
