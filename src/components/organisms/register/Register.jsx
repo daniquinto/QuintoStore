@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
 import { registerFullUser } from "../../../firebase/auth"
 
 const Register = () => {
@@ -23,9 +22,8 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    // Validar contraseñas coinciden
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setError('Passwords do not match.');
       return;
     }
 
@@ -39,118 +37,71 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      {/* Reducción de max-w y padding para evitar el scroll vertical */}
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transition-all">
-        <div className="p-6 md:p-10">
+    <div className="bg-white min-h-screen">
+      <div className="bg-mf-gray py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-4xl font-black text-mf-black uppercase tracking-tight mb-4">Register</h1>
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
+            <span className="text-mf-black">Home</span>
+            <span className="text-mf-dark-gray">/</span>
+            <span className="text-mf-dark-gray">Register</span>
+          </div>
+        </div>
+      </div>
 
-          <header className="mb-6 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Crear cuenta</h2>
-            <p className="text-gray-500 text-sm mt-1">Únete a nuestra comunidad hoy mismo</p>
-          </header>
+      <div className="max-w-2xl mx-auto px-4 py-24">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-black text-mf-black uppercase tracking-widest">Create Account</h2>
+          <p className="text-sm text-mf-dark-gray mt-2">Join MaleFashion and get the best experience.</p>
+        </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-8 p-4 bg-mf-red/10 border-l-4 border-mf-red text-mf-red text-xs font-bold uppercase tracking-widest">
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="md:col-span-2">
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Full Name</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} className="input-mf" placeholder="John Doe" required />
+          </div>
 
-              {/* Columna Izquierda: Información Personal */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Nombre completo</label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all placeholder:text-gray-400"
-                    placeholder="Ej. Juan Pérez"
-                    onChange={handleChange}
-                  />
-                </div>
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Email Address</label>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-mf" placeholder="email@example.com" required />
+          </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Correo electrónico</label>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all placeholder:text-gray-400"
-                    placeholder="correo@ejemplo.com"
-                    onChange={handleChange}
-                  />
-                </div>
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Cellphone</label>
+            <input type="text" name="cellphone" value={formData.cellphone} onChange={handleChange} className="input-mf" placeholder="+57 300..." required />
+          </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Celular</label>
-                    <input
-                      type="tel"
-                      name="cellphone"
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all"
-                      placeholder="+57 300..."
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Dirección</label>
-                    <input
-                      type="text"
-                      name="address"
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all"
-                      placeholder="Calle 123..."
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="md:col-span-2">
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Shipping Address</label>
+            <input type="text" name="address" value={formData.address} onChange={handleChange} className="input-mf" placeholder="Street 123, City" required />
+          </div>
 
-              {/* Columna Derecha: Seguridad */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Contraseña</label>
-                  <input
-                    type="password"
-                    name="password"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all"
-                    placeholder="••••••••"
-                    onChange={handleChange}
-                  />
-                  <p className="text-[10px] text-gray-400 mt-1 italic">Mínimo 8 caracteres (letras y números).</p>
-                </div>
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Password</label>
+            <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-mf" placeholder="••••••••" required />
+          </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Confirmar contraseña</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all"
-                    placeholder="••••••••"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black mb-2">Confirm Password</label>
+            <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="input-mf" placeholder="••••••••" required />
+          </div>
 
-            {/* Acción y Footer más compactos */}
-            <div className="pt-4 space-y-4">
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] text-base"
-              >
-                Registrarse
-              </button>
+          <button type="submit" className="md:col-span-2 btn-mf py-4 mt-4">
+            Register Now
+          </button>
+        </form>
 
-              <p className="text-center text-sm text-gray-500">
-                ¿Ya tienes una cuenta? <Link to="/login" className="text-indigo-600 font-semibold hover:underline">Inicia sesión</Link>
-              </p>
-            </div>
-          </form>
+        <div className="mt-12 text-center pt-8 border-t border-gray-100">
+          <p className="text-sm text-mf-dark-gray">Already have an account?</p>
+          <Link to="/login" className="inline-block mt-4 text-xs font-bold uppercase tracking-widest border-b-2 border-mf-black pb-1 hover:text-mf-red hover:border-mf-red transition-all">
+            Login here
+          </Link>
         </div>
       </div>
     </div>

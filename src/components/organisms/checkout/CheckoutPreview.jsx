@@ -1,7 +1,6 @@
 import React from 'react';
 import useCartStore from '../../../store/cartStore';
 import useUserStore from '../../../store/userStore';
-import Button from '../../atoms/Button';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import app from '../../../firebase/firebase.config';
@@ -28,91 +27,116 @@ const CheckoutPreview = () => {
         });
       }
       
-      alert('¡Compra confirmada! Gracias por elegir MyStore.');
+      alert('Purchase confirmed! Thank you for choosing MaleFashion.');
       clearCart();
       navigate('/gallery');
     } catch (error) {
       console.error("Error saving order:", error);
-      alert('Hubo un error al procesar tu compra. Por favor intenta de nuevo.');
+      alert('Error processing purchase. Please try again.');
     }
   };
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">No hay productos para el checkout</h2>
-        <Button onClick={() => navigate('/gallery')}>Volver a la tienda</Button>
+      <div className="bg-white min-h-screen flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold uppercase tracking-widest text-mf-dark-gray mb-6">No items for checkout</h2>
+        <button onClick={() => navigate('/gallery')} className="btn-mf">Back to Shop</button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-slate-800 mb-10">Resumen de tu Pedido</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Lista de productos */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-slate-800 mb-6">Productos</h2>
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.product.id} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                  <div className="flex items-center gap-4">
-                    <span className="bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold text-slate-600">
-                      {item.quantity}
-                    </span>
-                    <span className="text-slate-700 font-medium">{item.product.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-800">${(item.product.price * item.quantity).toFixed(2)}</span>
-                </div>
-              ))}
-            </div>
+    <div className="bg-white min-h-screen">
+      <div className="bg-mf-gray py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-4xl font-black text-mf-black uppercase tracking-tight mb-4">Checkout</h1>
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
+            <span className="text-mf-black">Home</span>
+            <span className="text-mf-dark-gray">/</span>
+            <span className="text-mf-black">Shop</span>
+            <span className="text-mf-dark-gray">/</span>
+            <span className="text-mf-dark-gray">Checkout</span>
           </div>
-          
-          {/* Información de envío */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-slate-800 mb-6">Datos de Envío</h2>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-20">
+        <div className="lg:flex gap-16">
+          {/* Billing Details */}
+          <div className="lg:w-2/3">
+            <h2 className="text-xl font-black uppercase tracking-widest text-mf-black mb-10 border-b-2 border-mf-gray pb-4">
+              Billing Details
+            </h2>
+            
             {user ? (
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-slate-400">Nombre</p>
-                  <p className="font-bold text-slate-700">{user.name}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-mf-dark-gray">Full Name</p>
+                  <p className="text-mf-black font-bold border-b border-gray-100 pb-2">{user.name || user.displayName || 'Not provided'}</p>
                 </div>
-                <div>
-                  <p className="text-slate-400">Email</p>
-                  <p className="font-bold text-slate-700">{user.email}</p>
+                <div className="space-y-2">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-mf-dark-gray">Email Address</p>
+                  <p className="text-mf-black font-bold border-b border-gray-100 pb-2">{user.email}</p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-slate-400">Dirección</p>
-                  <p className="font-bold text-slate-700">{user.address}</p>
+                <div className="md:col-span-2 space-y-2">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-mf-dark-gray">Shipping Address</p>
+                  <p className="text-mf-black font-bold border-b border-gray-100 pb-2">{user.address || 'Not provided'}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-slate-400 italic">No has iniciado sesión. Los datos se solicitarán al pagar.</p>
+              <div className="bg-mf-gray p-8 text-center">
+                <p className="text-sm font-bold uppercase tracking-widest text-mf-dark-gray mb-4">You are checking out as guest</p>
+                <button onClick={() => navigate('/login')} className="text-xs font-bold uppercase tracking-widest border-b-2 border-mf-black pb-1 hover:text-mf-red hover:border-mf-red transition-all">
+                  Login for better experience
+                </button>
+              </div>
             )}
-          </div>
-        </div>
-        
-        {/* Total y Acción */}
-        <div className="md:col-span-1">
-          <div className="bg-brand-blue p-8 rounded-3xl shadow-xl shadow-brand-blue/20 text-white sticky top-24">
-            <h2 className="text-xl font-bold mb-6">Total a Pagar</h2>
-            <div className="flex justify-between items-end mb-8">
-              <span className="text-white/70">Subtotal + Envío</span>
-              <span className="text-4xl font-black">${getTotalPrice().toFixed(2)}</span>
+
+            <div className="mt-16 bg-mf-gray p-10">
+              <h3 className="text-sm font-black uppercase tracking-widest text-mf-black mb-4">Payment Method</h3>
+              <p className="text-xs text-mf-dark-gray leading-relaxed">
+                Cash on delivery. Pay with cash upon delivery. 
+                Other payment methods (Credit Card, PayPal) will be available soon.
+              </p>
             </div>
-            
-            <Button 
-              onClick={handleConfirm}
-              className="w-full bg-white !text-brand-blue hover:bg-gray-100 py-4 text-lg font-bold shadow-none"
-            >
-              Confirmar Compra
-            </Button>
-            
-            <p className="text-center text-xs text-white/50 mt-6">
-              Al confirmar, aceptas nuestros términos y condiciones de servicio.
-            </p>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:w-1/3 mt-16 lg:mt-0">
+            <div className="bg-mf-black text-white p-10">
+              <h2 className="text-lg font-black uppercase tracking-widest mb-8 border-b border-white/10 pb-6">Your Order</h2>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest text-white/50 pb-2 border-b border-white/5">
+                  <span>Product</span>
+                  <span>Total</span>
+                </div>
+                {items.map((item) => (
+                  <div key={item.product.id} className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                    <span className="text-white/80 line-clamp-1 flex-1 pr-4">{item.product.name} x {item.quantity}</span>
+                    <span className="text-white">${(item.product.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-4 pt-6 border-t border-white/10 mb-10">
+                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                  <span className="text-white/50">Subtotal</span>
+                  <span>${getTotalPrice().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-black uppercase tracking-widest">
+                  <span className="text-mf-red">Total</span>
+                  <span className="text-mf-red">${getTotalPrice().toFixed(2)}</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={handleConfirm}
+                className="w-full bg-white text-mf-black hover:bg-mf-red hover:text-white py-4 text-xs font-black uppercase tracking-widest transition-all duration-300"
+              >
+                Place Order
+              </button>
+            </div>
           </div>
         </div>
       </div>
