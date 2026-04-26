@@ -33,11 +33,11 @@ const Cart = () => {
   return (
     <div className="bg-white min-h-screen font-ubuntu pb-20">
       {/* Header Section */}
-      <div className="bg-quinto-50/50 py-20 border-b border-quinto-100">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-end">
+      <div className="bg-quinto-50/50 py-12 md:py-20 border-b border-quinto-100">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
-            <h1 className="text-5xl font-black text-quinto-900 uppercase tracking-tighter">Your Bag</h1>
-            <p className="text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Ready for worldwide shipping</p>
+            <h1 className="text-4xl md:text-5xl font-black text-quinto-900 uppercase tracking-tighter">Your Bag</h1>
+            <p className="text-[10px] md:text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Ready for worldwide shipping</p>
           </div>
           <span className="text-[10px] font-black text-quinto-400 uppercase tracking-[0.3em]">{items.length} Unique Pieces</span>
         </div>

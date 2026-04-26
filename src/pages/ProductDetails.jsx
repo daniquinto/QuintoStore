@@ -72,7 +72,7 @@ export default function ProductDetails() {
         <div className="lg:flex gap-20">
           {/* Gallery Showcase */}
           <div className="lg:w-1/2 mb-12 lg:mb-0">
-            <div className="quinto-card bg-quinto-50/20 aspect-[4/5] flex items-center justify-center p-20 overflow-hidden relative">
+            <div className="quinto-card bg-quinto-50/20 aspect-[4/5] flex items-center justify-center p-10 md:p-20 overflow-hidden relative">
                <div className="absolute top-10 right-10 flex flex-col gap-4 z-10">
                  <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:text-quinto-500 transition-colors">
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@ export default function ProductDetails() {
           <div className="lg:w-1/2 flex flex-col">
             <div className="mb-8">
               <span className="text-quinto-500 text-xs font-black uppercase tracking-[0.3em] mb-4 block">Premium Piece</span>
-              <h1 className="text-5xl font-black text-quinto-900 tracking-tighter uppercase leading-[0.95] mb-6">
+              <h1 className="text-4xl md:text-5xl font-black text-quinto-900 tracking-tighter uppercase leading-[0.95] mb-6">
                 {product.title}
               </h1>
               
@@ -125,8 +125,8 @@ export default function ProductDetails() {
 
             {/* Shopping Logic */}
             <div className="flex flex-col gap-8 mb-12">
-              <div className="flex items-center gap-10">
-                <div className="flex items-center bg-quinto-50 rounded-2xl p-1 gap-1 border border-quinto-100">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6 sm:gap-10">
+                <div className="flex items-center justify-between sm:justify-start bg-quinto-50 rounded-2xl p-1 gap-1 border border-quinto-100">
                   <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-12 h-12 flex items-center justify-center font-black hover:bg-white rounded-xl transition-all text-quinto-800">−</button>
                   <span className="w-10 text-center font-black text-quinto-900">{quantity}</span>
                   <button onClick={() => setQuantity(q => q + 1)} className="w-12 h-12 flex items-center justify-center font-black hover:bg-white rounded-xl transition-all text-quinto-800">+</button>
@@ -135,10 +135,10 @@ export default function ProductDetails() {
                 <button 
                   onClick={handleAddToCart}
                   disabled={added}
-                  className={`flex-1 quinto-btn-primary h-14 ${added ? 'bg-green-600 hover:bg-green-700 border-none' : ''}`}
+                  className={`flex-1 min-h-[56px] md:h-14 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${added ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'bg-quinto-900 text-white hover:bg-quinto-800 shadow-xl shadow-quinto-900/10'}`}
                 >
                   {added ? (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center gap-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth="3" /></svg>
                       Added to Cart
                     </span>

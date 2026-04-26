@@ -3,6 +3,8 @@
 ## General Information
 **Project Name**: Quinto Store - E-commerce  
 **Author**: Daniela Quinto Rios
+**Repository**: [https://github.com/daniquinto/QuintoStore](https://github.com/daniquinto/QuintoStore)  
+**Live Demo**: [https://daniquinto.github.io/QuintoStore/](https://daniquinto.github.io/QuintoStore/)
 
 
 ---
@@ -71,6 +73,10 @@ The application uses a NoSQL structure in Cloud Firestore with the following mai
 ---
 
 ## Installation and Use
+**Repository**: [https://github.com/daniquinto/QuintoStore](https://github.com/daniquinto/QuintoStore)  
+**Live Demo**: [https://daniquinto.github.io/QuintoStore/](https://daniquinto.github.io/QuintoStore/)
+
+---
 1. **Clone the repository**
    ```bash
    git clone https://github.com/daniquinto/Mystore.git
