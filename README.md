@@ -3,7 +3,7 @@
 ## General Information
 **Project Name**: Quinto Store - E-commerce  
 **Author**: Daniela Quinto Rios
-**Course**: Full Stack Development Sapiencia 
+
 
 ---
 
