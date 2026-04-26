@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { subscribeToAuthChanges } from '../../../firebase/auth';
 
-export default function NavBar() {
+export default function Header() {
   const location = useLocation();
   const [loggedInUser, setLoggedInUser] = useState(null);
 
