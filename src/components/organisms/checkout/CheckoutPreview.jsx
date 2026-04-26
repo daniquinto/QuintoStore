@@ -11,13 +11,14 @@ const CheckoutPreview = () => {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const { user } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
   const [selectedAddress, setSelectedAddress] = useState('');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [fullUser, setFullUser] = useState(null);
 
-  // New Address Structure (Same as Register)
+  // New Address Structure
   const [newAddrData, setNewAddrData] = useState({
     department: '',
     city: '',
@@ -26,6 +27,20 @@ const CheckoutPreview = () => {
   const [departments, setDepartments] = useState([]);
   const [allCities, setAllCities] = useState([]);
   const [filteredCities, setFilteredCities] = useState([]);
+
+  const fetchUserData = async () => {
+    if (user) {
+      const db = getFirestore(app);
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setFullUser(data);
+        if (data.addresses && data.addresses.length > 0 && !selectedAddress) {
+          setSelectedAddress(data.addresses[0]);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,19 +56,7 @@ const CheckoutPreview = () => {
       }
     };
     fetchData();
-
-    if (user) {
-      const db = getFirestore(app);
-      getDoc(doc(db, "users", user.uid)).then(userDoc => {
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setFullUser(data);
-          if (data.addresses && data.addresses.length > 0) {
-            setSelectedAddress(data.addresses[0]);
-          }
-        }
-      });
-    }
+    fetchUserData();
   }, [user]);
 
   useEffect(() => {
@@ -65,36 +68,47 @@ const CheckoutPreview = () => {
     }
   }, [newAddrData.department, departments, allCities]);
 
-  const handleConfirm = async () => {
-    let finalAddress = selectedAddress;
-    
-    if (isAddingNew) {
-      if (!newAddrData.department || !newAddrData.city || !newAddrData.details) {
-        alert("Please complete the new address fields.");
-        return;
-      }
-      finalAddress = `${newAddrData.details}, ${newAddrData.city}, ${newAddrData.department}, Colombia`;
+  const handleSaveNewAddress = async () => {
+    if (!newAddrData.department || !newAddrData.city || !newAddrData.details) {
+      alert("Please complete all address fields.");
+      return;
     }
 
-    if (!finalAddress) {
-      alert("Please select or add a shipping address.");
+    setSaveLoading(true);
+    try {
+      const finalAddress = `${newAddrData.details}, ${newAddrData.city}, ${newAddrData.department}, Colombia`;
+      const db = getFirestore(app);
+      
+      await updateDoc(doc(db, "users", user.uid), {
+        addresses: arrayUnion(finalAddress)
+      });
+
+      // Update local state to reflect new address immediately
+      await fetchUserData();
+      setSelectedAddress(finalAddress);
+      setIsAddingNew(false);
+      setNewAddrData({ department: '', city: '', details: '' });
+    } catch (error) {
+      console.error("Error saving address:", error);
+      alert("Error saving address to profile.");
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedAddress) {
+      alert("Please select a shipping address.");
       return;
     }
 
     setLoading(true);
     try {
       const db = getFirestore(app);
-      
-      if (isAddingNew && user) {
-        await updateDoc(doc(db, "users", user.uid), {
-          addresses: arrayUnion(finalAddress)
-        });
-      }
-
       await addDoc(collection(db, "orders"), {
         userId: user.uid,
         customerName: user.name || user.displayName || 'Quinto Client',
-        shippingAddress: finalAddress,
+        shippingAddress: selectedAddress,
         items: items.map(item => ({
           id: item.product.id,
           name: item.product.name,
@@ -183,7 +197,7 @@ const CheckoutPreview = () => {
               </div>
 
               {isAddingNew && (
-                <div className="animate-fade-in bg-quinto-50/50 p-10 rounded-[2.5rem] border-2 border-quinto-100 border-dashed space-y-6">
+                <div className="animate-fade-in bg-quinto-50/50 p-10 rounded-[2.5rem] border-2 border-quinto-100 border-dashed space-y-8">
                   <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-900 mb-2">New Shipping Detail</h3>
                   
                   <div className="grid grid-cols-2 gap-6">
@@ -222,11 +236,20 @@ const CheckoutPreview = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-quinto-400">
-                    <div className="w-5 h-5 rounded-full bg-quinto-500/10 flex items-center justify-center text-quinto-500">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-4 border-t border-quinto-100">
+                    <div className="flex items-center gap-3 text-quinto-400">
+                      <div className="w-5 h-5 rounded-full bg-quinto-500/10 flex items-center justify-center text-quinto-500">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      </div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest">Saves to your profile profile</p>
                     </div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest">Format: Details, City, Department, Colombia</p>
+                    <button 
+                      onClick={handleSaveNewAddress}
+                      disabled={saveLoading}
+                      className="w-full sm:w-auto px-10 h-14 bg-quinto-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-quinto-800 shadow-xl shadow-quinto-900/20"
+                    >
+                      {saveLoading ? 'Saving...' : 'Save & Use Address'}
+                    </button>
                   </div>
                 </div>
               )}
@@ -253,7 +276,7 @@ const CheckoutPreview = () => {
 
           <div className="lg:w-1/3">
             <div className="quinto-card p-10 bg-quinto-900 text-white sticky top-32">
-              <h2 className="text-xl font-black uppercase tracking-widest mb-10 border-b border-white/10 pb-6">Checkout</h2>
+              <h2 className="text-xl font-black uppercase tracking-widest mb-10 border-b border-white/10 pb-6">Final Order</h2>
               
               <div className="space-y-6 mb-12">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-60">
@@ -272,11 +295,12 @@ const CheckoutPreview = () => {
 
               <button 
                 onClick={handleConfirm}
-                disabled={loading}
-                className="w-full bg-white text-quinto-900 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-quinto-400 transition-all shadow-2xl shadow-black/20"
+                disabled={loading || isAddingNew}
+                className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-2xl ${isAddingNew ? 'bg-white/20 text-white/40 cursor-not-allowed' : 'bg-white text-quinto-900 hover:bg-quinto-400 shadow-black/20'}`}
               >
-                {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-quinto-900" /> : 'Confirm Order'}
+                {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-quinto-900" /> : 'Place Order'}
               </button>
+              {isAddingNew && <p className="mt-4 text-[9px] text-center text-quinto-400 font-bold uppercase tracking-widest">Save the new address to continue</p>}
             </div>
           </div>
         </div>
