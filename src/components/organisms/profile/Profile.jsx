@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToAuthChanges, logoutUser } from '../../../firebase/auth';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import app from '../../../firebase/firebase.config';
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     /* 
@@ -15,8 +18,26 @@ export default function Profile() {
       // setLoading(false);
     */
 
-    const unsubscribe = subscribeToAuthChanges((currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = subscribeToAuthChanges(async (currentUser) => {
+      if (currentUser) {
+        const db = getFirestore(app);
+        
+        // Fetch user profile
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        setUser(userDoc.exists() ? { ...currentUser, ...userDoc.data() } : currentUser);
+        
+        // Fetch order history
+        const q = query(
+          collection(db, "orders"), 
+          where("userId", "==", currentUser.uid),
+          orderBy("createdAt", "desc")
+        );
+        const querySnapshot = await getDocs(q);
+        setOrders(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } else {
+        setUser(null);
+        setOrders([]);
+      }
       setLoading(false);
     });
 
@@ -101,12 +122,47 @@ export default function Profile() {
               <dt className="text-sm font-medium text-gray-500">Account status</dt>
               <dd className="mt-1 text-sm text-green-600 font-medium">Active</dd>
             </div>
+            
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Cellphone</dt>
+              <dd className="mt-1 text-sm text-gray-900">{user.cellphone || 'Not provided'}</dd>
+            </div>
+            
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Address</dt>
+              <dd className="mt-1 text-sm text-gray-900">{user.address || 'Not provided'}</dd>
+            </div>
             {/* Add more info later if available connected logic */}
             <div className="sm:col-span-2">
                <dt className="text-sm font-medium text-gray-500">Email Verified</dt>
                <dd className="mt-1 text-sm text-gray-900">{user.emailVerified ? 'Yes' : 'No'}</dd>
             </div>
           </dl>
+        </div>
+
+        {/* Order History Section */}
+        <div className="border-t border-gray-100 p-6 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Order History</h3>
+          {orders.length > 0 ? (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-bold text-brand-blue uppercase">Order #{order.id.slice(-6)}</span>
+                    <span className="text-xs text-gray-400">{order.createdAt?.toDate().toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-600">
+                      {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                    </div>
+                    <div className="text-lg font-black text-slate-800">${order.total?.toFixed(2)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No orders found yet.</p>
+          )}
         </div>
       </div>
     </div>

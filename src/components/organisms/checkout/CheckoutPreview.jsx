@@ -3,16 +3,38 @@ import useCartStore from '../../../store/cartStore';
 import useUserStore from '../../../store/userStore';
 import Button from '../../atoms/Button';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import app from '../../../firebase/firebase.config';
 
 const CheckoutPreview = () => {
   const navigate = useNavigate();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const { user } = useUserStore();
 
-  const handleConfirm = () => {
-    alert('¡Compra confirmada! Gracias por elegir MyStore.');
-    clearCart();
-    navigate('/gallery');
+  const handleConfirm = async () => {
+    try {
+      if (user) {
+        const db = getFirestore(app);
+        await addDoc(collection(db, "orders"), {
+          userId: user.uid,
+          items: items.map(item => ({
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity
+          })),
+          total: getTotalPrice(),
+          createdAt: new Date()
+        });
+      }
+      
+      alert('¡Compra confirmada! Gracias por elegir MyStore.');
+      clearCart();
+      navigate('/gallery');
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert('Hubo un error al procesar tu compra. Por favor intenta de nuevo.');
+    }
   };
 
   if (items.length === 0) {
