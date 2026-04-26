@@ -1,5 +1,6 @@
 import { imageMap } from "../../assets/imageMap";
 import { Link } from "react-router-dom";
+import useCartStore from "../../store/cartStore";
 
 const formatCategory = (category) => {
   if (category === 'jewelery') return 'Jewelry';
@@ -9,6 +10,13 @@ const formatCategory = (category) => {
 function ProductCard({ product }) {
   const resolvedImage = imageMap[product.image] ?? product.image;
   const rating = product.rating?.rate || product.rate || 0;
+  const addItem = useCartStore((state) => state.addItem);
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product);
+  };
 
   return (
     <div className="quinto-card group flex flex-col h-full overflow-hidden">
@@ -29,8 +37,11 @@ function ProductCard({ product }) {
 
         {/* Floating Quick Add */}
         <div className="absolute bottom-4 left-4 right-4 translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
-           <button className="w-full bg-quinto-900/90 backdrop-blur-sm text-white py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg">
-             View Details
+           <button 
+             onClick={handleAddToCart}
+             className="w-full bg-quinto-900/90 backdrop-blur-sm text-white py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-quinto-800"
+           >
+             Quick Add
            </button>
         </div>
       </Link>
@@ -56,7 +67,10 @@ function ProductCard({ product }) {
         
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-quinto-50">
           <p className="text-lg font-black text-quinto-900">${product.price}</p>
-          <button className="w-8 h-8 rounded-full bg-quinto-50 flex items-center justify-center hover:bg-quinto-800 hover:text-white transition-all text-quinto-800">
+          <button 
+            onClick={handleAddToCart}
+            className="w-8 h-8 rounded-full bg-quinto-50 flex items-center justify-center hover:bg-quinto-800 hover:text-white transition-all text-quinto-800"
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>

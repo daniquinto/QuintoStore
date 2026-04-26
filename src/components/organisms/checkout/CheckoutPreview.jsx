@@ -4,6 +4,7 @@ import useUserStore from '../../../store/userStore';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import app from '../../../firebase/firebase.config';
+import axios from 'axios';
 
 const CheckoutPreview = () => {
   const navigate = useNavigate();
@@ -13,15 +14,37 @@ const CheckoutPreview = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   
   const [selectedAddress, setSelectedAddress] = useState('');
-  const [newAddress, setNewAddress] = useState('');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [fullUser, setFullUser] = useState(null);
 
+  // New Address Structure (Same as Register)
+  const [newAddrData, setNewAddrData] = useState({
+    department: '',
+    city: '',
+    details: ''
+  });
+  const [departments, setDepartments] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
+
   useEffect(() => {
-    const fetchUser = async () => {
-      if (user) {
-        const db = getFirestore(app);
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+    const fetchData = async () => {
+      try {
+        const [deptRes, cityRes] = await Promise.all([
+          axios.get('https://api-colombia.com/api/v1/Department'),
+          axios.get('https://api-colombia.com/api/v1/City')
+        ]);
+        setDepartments(deptRes.data.sort((a, b) => a.name.localeCompare(b.name)));
+        setAllCities(cityRes.data);
+      } catch (err) {
+        console.error("API Colombia Error:", err);
+      }
+    };
+    fetchData();
+
+    if (user) {
+      const db = getFirestore(app);
+      getDoc(doc(db, "users", user.uid)).then(userDoc => {
         if (userDoc.exists()) {
           const data = userDoc.data();
           setFullUser(data);
@@ -29,15 +52,31 @@ const CheckoutPreview = () => {
             setSelectedAddress(data.addresses[0]);
           }
         }
-      }
-    };
-    fetchUser();
+      });
+    }
   }, [user]);
 
+  useEffect(() => {
+    if (newAddrData.department) {
+      const deptId = departments.find(d => d.name === newAddrData.department)?.id;
+      if (deptId) {
+        setFilteredCities(allCities.filter(c => c.departmentId === deptId).sort((a, b) => a.name.localeCompare(b.name)));
+      }
+    }
+  }, [newAddrData.department, departments, allCities]);
+
   const handleConfirm = async () => {
-    const finalAddress = isAddingNew ? newAddress : selectedAddress;
+    let finalAddress = selectedAddress;
     
-    if (!finalAddress || !finalAddress.trim()) {
+    if (isAddingNew) {
+      if (!newAddrData.department || !newAddrData.city || !newAddrData.details) {
+        alert("Please complete the new address fields.");
+        return;
+      }
+      finalAddress = `${newAddrData.details}, ${newAddrData.city}, ${newAddrData.department}, Colombia`;
+    }
+
+    if (!finalAddress) {
       alert("Please select or add a shipping address.");
       return;
     }
@@ -48,7 +87,7 @@ const CheckoutPreview = () => {
       
       if (isAddingNew && user) {
         await updateDoc(doc(db, "users", user.uid), {
-          addresses: arrayUnion(newAddress.trim())
+          addresses: arrayUnion(finalAddress)
         });
       }
 
@@ -63,18 +102,16 @@ const CheckoutPreview = () => {
           quantity: item.quantity
         })),
         total: getTotalPrice(),
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'Contraentrega',
         status: 'Confirmed',
         createdAt: new Date()
       });
       
       setIsSuccess(true);
       clearCart();
-      setTimeout(() => {
-        navigate('/gallery');
-      }, 3000);
+      setTimeout(() => navigate('/gallery'), 3000);
     } catch (error) {
-      console.error("Error saving order:", error);
+      console.error("Purchase Error:", error);
       alert('Error processing purchase.');
     } finally {
       setLoading(false);
@@ -88,7 +125,7 @@ const CheckoutPreview = () => {
           <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
         </div>
         <h2 className="text-4xl font-black text-quinto-900 uppercase tracking-tighter mb-4">Order Placed!</h2>
-        <p className="text-quinto-600 font-bold uppercase tracking-widest text-xs mb-8">Payment: Cash on Delivery. Redirecting...</p>
+        <p className="text-quinto-600 font-bold uppercase tracking-widest text-xs mb-8">Method: Contraentrega. Redirecting...</p>
         <div className="w-64 h-1 bg-quinto-100 rounded-full overflow-hidden">
           <div className="h-full bg-quinto-900 animate-[loading_3s_ease-in-out]"></div>
         </div>
@@ -102,7 +139,7 @@ const CheckoutPreview = () => {
       <div className="bg-quinto-50/50 py-20 border-b border-quinto-100">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-5xl font-black text-quinto-900 uppercase tracking-tighter">Shipping Info</h1>
-          <p className="text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Complete your purchase details</p>
+          <p className="text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Contraentrega Worldwide Delivery</p>
         </div>
       </div>
 
@@ -114,7 +151,6 @@ const CheckoutPreview = () => {
             </h2>
             
             <div className="space-y-10">
-              {/* Dropdown Selector */}
               <div className="space-y-4">
                 <label className="block text-[11px] font-black uppercase tracking-[0.3em] text-quinto-400">
                   Select Registered Address
@@ -146,32 +182,60 @@ const CheckoutPreview = () => {
                 </div>
               </div>
 
-              {/* New Address Form */}
               {isAddingNew && (
-                <div className="animate-fade-in bg-quinto-50/50 p-10 rounded-[2.5rem] border-2 border-quinto-100 border-dashed">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-900 mb-6">New Shipping Detail</h3>
-                  <textarea 
-                    autoFocus
-                    value={newAddress}
-                    onChange={(e) => setNewAddress(e.target.value)}
-                    placeholder="Enter full address, apartment, city, state..."
-                    className="quinto-input !bg-white min-h-[140px] !text-sm mb-6"
-                  />
+                <div className="animate-fade-in bg-quinto-50/50 p-10 rounded-[2.5rem] border-2 border-quinto-100 border-dashed space-y-6">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-900 mb-2">New Shipping Detail</h3>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-quinto-400">Department</label>
+                      <select 
+                        value={newAddrData.department}
+                        onChange={(e) => setNewAddrData({...newAddrData, department: e.target.value, city: ''})}
+                        className="quinto-input !bg-white !text-sm"
+                      >
+                        <option value="">Select State</option>
+                        {departments.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-quinto-400">City</label>
+                      <select 
+                        disabled={!newAddrData.department}
+                        value={newAddrData.city}
+                        onChange={(e) => setNewAddrData({...newAddrData, city: e.target.value})}
+                        className="quinto-input !bg-white !text-sm"
+                      >
+                        <option value="">Select City</option>
+                        {filteredCities.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-quinto-400">Street Address & Details</label>
+                      <input 
+                        type="text"
+                        value={newAddrData.details}
+                        onChange={(e) => setNewAddrData({...newAddrData, details: e.target.value})}
+                        placeholder="Calle 123 # 45 - 67, Apt 101"
+                        className="quinto-input !bg-white !text-sm"
+                      />
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-3 text-quinto-400">
                     <div className="w-5 h-5 rounded-full bg-quinto-500/10 flex items-center justify-center text-quinto-500">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest">Address will be saved to your profile</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest">Format: Details, City, Department, Colombia</p>
                   </div>
                 </div>
               )}
 
-              {/* Order Preview */}
               <div className="pt-10 border-t border-quinto-50">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-400 mb-8">Items in your bag</h3>
+                <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-400 mb-8">Summary Bag</h3>
                 <div className="space-y-4">
                   {items.map((item) => (
-                    <div key={item.product.id} className="flex items-center gap-6 p-4 hover:bg-quinto-50/20 transition-colors rounded-2xl">
+                    <div key={item.product.id} className="flex items-center gap-6 p-4 rounded-2xl">
                       <div className="w-16 h-16 bg-quinto-50 rounded-xl p-2 shrink-0">
                         <img src={item.product.image} alt="" className="w-full h-full object-contain mix-blend-multiply" />
                       </div>
@@ -187,10 +251,9 @@ const CheckoutPreview = () => {
             </div>
           </div>
 
-          {/* Checkout Card */}
           <div className="lg:w-1/3">
             <div className="quinto-card p-10 bg-quinto-900 text-white sticky top-32">
-              <h2 className="text-xl font-black uppercase tracking-widest mb-10 border-b border-white/10 pb-6">Final Total</h2>
+              <h2 className="text-xl font-black uppercase tracking-widest mb-10 border-b border-white/10 pb-6">Checkout</h2>
               
               <div className="space-y-6 mb-12">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-60">
