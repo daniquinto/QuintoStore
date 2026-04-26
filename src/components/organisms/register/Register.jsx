@@ -13,40 +13,47 @@ const PHONE_RULES = {
 };
 
 const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors, prefix = null }) => (
-  <div className="space-y-1">
-    <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black">
+  <div className="space-y-2">
+    <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-quinto-600">
       {label}
     </label>
     <div className="relative flex">
       {prefix && (
-        <span className="flex items-center px-4 bg-mf-gray border-2 border-r-0 border-mf-gray text-xs font-bold text-mf-black">
+        <span className="flex items-center px-4 bg-quinto-50 border-2 border-r-0 border-quinto-50 text-xs font-bold text-quinto-900 rounded-l-xl">
           {prefix}
         </span>
       )}
       {options ? (
-        <select
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          disabled={name === 'city' && !formData.department}
-          className={`input-mf appearance-none bg-white ${errors[name] ? 'border-mf-red' : ''}`}
-        >
-          <option value="">Select {label}</option>
-          {options.map(opt => <option key={opt.id || opt.name || opt} value={opt.name || opt}>{opt.name || opt}</option>)}
-        </select>
+        <div className="relative w-full">
+          <select
+            name={name}
+            value={formData[name]}
+            onChange={handleChange}
+            disabled={name === 'city' && !formData.department}
+            className={`quinto-input appearance-none bg-white pr-10 ${errors[name] ? 'border-red-500' : ''}`}
+          >
+            <option value="">Select {label}</option>
+            {options.map(opt => <option key={opt.id || opt.name || opt} value={opt.name || opt}>{opt.name || opt}</option>)}
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg className="w-4 h-4 text-quinto-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
       ) : (
         <input
           type={type}
           name={name}
           value={formData[name]}
           onChange={handleChange}
-          className={`input-mf ${errors[name] ? 'border-mf-red' : ''} ${prefix ? 'rounded-l-none' : ''}`}
+          className={`quinto-input ${errors[name] ? 'border-red-500' : ''} ${prefix ? 'rounded-l-none' : ''}`}
           placeholder={placeholder}
         />
       )}
     </div>
     {errors[name] && (
-      <p className="text-[10px] text-mf-red font-bold uppercase tracking-tighter">{errors[name]}</p>
+      <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">{errors[name]}</p>
     )}
   </div>
 );
@@ -83,7 +90,7 @@ const Register = () => {
         setDepartments(deptRes.data.sort((a, b) => a.name.localeCompare(b.name)));
         setAllCities(cityRes.data);
       } catch (err) {
-        setApiError("Error al cargar datos de Colombia.");
+        setApiError("Connection issue with Colombia API.");
       }
     };
     fetchData();
@@ -107,33 +114,33 @@ const Register = () => {
     let error = '';
     switch (name) {
       case 'name':
-        if (!value.trim()) error = 'El nombre es obligatorio.';
+        if (!value.trim()) error = 'Name is required.';
         break;
       case 'email':
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Email inválido.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email address.';
         break;
       case 'cellphone':
         const rule = PHONE_RULES[currentPrefix];
         if (rule && !rule.regex.test(value)) {
-          error = `Formato inválido para ${currentPrefix}. Req: ${rule.label}`;
+          error = `Invalid for ${currentPrefix}. Need: ${rule.label}`;
         }
         break;
       case 'password':
-        if (value.length < 8) error = 'Mínimo 8 caracteres.';
-        else if (!/[A-Z]/.test(value)) error = 'Al menos una mayúscula.';
-        else if (!/[0-9]/.test(value)) error = 'Al menos un número.';
+        if (value.length < 8) error = 'Min 8 characters.';
+        else if (!/[A-Z]/.test(value)) error = 'Need 1 uppercase.';
+        else if (!/[0-9]/.test(value)) error = 'Need 1 number.';
         break;
       case 'confirmPassword':
-        if (value !== formData.password) error = 'Las contraseñas no coinciden.';
+        if (value !== formData.password) error = 'Passwords do not match.';
         break;
       case 'department':
-        if (!value) error = 'Selecciona un departamento.';
+        if (!value) error = 'Select state.';
         break;
       case 'city':
-        if (!value) error = 'Selecciona una ciudad.';
+        if (!value) error = 'Select city.';
         break;
       case 'addressDetails':
-        if (!value.trim()) error = 'Ingresa los detalles.';
+        if (!value.trim()) error = 'Address details missing.';
         break;
       default:
         break;
@@ -156,19 +163,9 @@ const Register = () => {
         [name]: newValue,
         ...(name === 'department' ? { city: '' } : {})
       };
-      
-      // Dynamic validation
       validateField(name, newValue, updated.phonePrefix);
-      
-      if (name === 'password') {
-        validateField('confirmPassword', updated.confirmPassword, updated.phonePrefix);
-      }
-
-      // If prefix changes, re-validate cellphone
-      if (name === 'phonePrefix') {
-        validateField('cellphone', updated.cellphone, newValue);
-      }
-
+      if (name === 'password') validateField('confirmPassword', updated.confirmPassword, updated.phonePrefix);
+      if (name === 'phonePrefix') validateField('cellphone', updated.cellphone, newValue);
       return updated;
     });
   };
@@ -176,134 +173,113 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
-    
     const formErrors = {};
     Object.keys(formData).forEach(key => {
       const error = validateField(key, formData[key]);
       if (error) formErrors[key] = error;
     });
-
     if (Object.values(formErrors).some(err => err !== '')) {
       setErrors(formErrors);
-      setApiError('Por favor corrige los errores antes de continuar.');
+      setApiError('Correct errors before proceeding.');
       return;
     }
-
     setLoading(true);
     try {
       const fullAddress = `${formData.addressDetails}, ${formData.city}, ${formData.department}, Colombia`;
       const fullPhone = `${formData.phonePrefix} ${formData.cellphone}`;
       const submissionData = { ...formData, address: fullAddress, cellphone: fullPhone };
       const respuesta = await registerFullUser(submissionData);
-      if (respuesta.success) {
-        navigate('/login');
-      } else {
-        setApiError(`Error: ${respuesta.error}`);
-      }
+      if (respuesta.success) navigate('/login');
+      else setApiError(`Error: ${respuesta.error}`);
     } catch (err) {
-      setApiError('Ocurrió un error inesperado.');
+      setApiError('An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white min-h-screen pb-20">
-      <div className="bg-mf-gray py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-black text-mf-black uppercase tracking-tight mb-4">Register</h1>
-          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-mf-dark-gray">
-            <span className="text-mf-black">Home</span> / Register
+    <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
+      <div className="max-w-4xl w-full mx-4 flex flex-col md:flex-row quinto-card overflow-hidden">
+        {/* Left Side - Visual */}
+        <div className="md:w-5/12 bg-quinto-900 p-12 text-white flex flex-col justify-between relative">
+          <div className="absolute top-0 left-0 w-full h-full bg-quinto-500/10 blur-[80px] rounded-full translate-x-[-50%] translate-y-[-50%]"></div>
+          <div className="relative z-10">
+            <span className="text-quinto-400 text-[10px] font-black uppercase tracking-[0.4em]">QUINTO STORE</span>
+            <h2 className="text-4xl font-black tracking-tighter mt-4 leading-tight">JOIN THE<br />SELECT.</h2>
+          </div>
+          <div className="space-y-4 relative z-10">
+             <div className="flex gap-3">
+               <div className="w-5 h-5 rounded-full bg-quinto-500/20 flex items-center justify-center text-quinto-400 text-[10px]">✓</div>
+               <p className="text-xs font-medium opacity-70">Premium member benefits</p>
+             </div>
+             <div className="flex gap-3">
+               <div className="w-5 h-5 rounded-full bg-quinto-500/20 flex items-center justify-center text-quinto-400 text-[10px]">✓</div>
+               <p className="text-xs font-medium opacity-70">Secured worldwide access</p>
+             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-3xl mx-auto px-4 pt-20">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-black text-mf-black uppercase tracking-widest">Create Account</h2>
-        </div>
-
-        {apiError && (
-          <div className="mb-8 p-4 bg-mf-red/10 border-l-4 border-mf-red text-mf-red text-[11px] font-bold uppercase tracking-widest">
-            {apiError}
+        {/* Right Side - Form */}
+        <div className="md:w-7/12 p-12 bg-white">
+          <div className="mb-10">
+            <h1 className="text-2xl font-black tracking-tight text-quinto-900">CREATE ACCOUNT</h1>
+            <p className="text-xs font-bold text-quinto-400 uppercase tracking-widest mt-1">Experience Quinto Excellence</p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-12">
-          {/* General Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="md:col-span-2">
-              <InputGroup label="Full Name" name="name" placeholder="John Doe" formData={formData} handleChange={handleChange} errors={errors} />
+          {apiError && (
+            <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-600 text-[10px] font-black uppercase tracking-widest">
+              {apiError}
             </div>
-            <InputGroup label="Email Address" name="email" type="email" placeholder="email@example.com" formData={formData} handleChange={handleChange} errors={errors} />
-            
-            <div className="space-y-1">
-              <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black">Cellphone</label>
-              <div className="flex">
-                <select 
-                  name="phonePrefix" 
-                  value={formData.phonePrefix} 
-                  onChange={handleChange} 
-                  className="bg-mf-gray border-2 border-r-0 border-mf-gray text-sm font-bold px-3 outline-none focus:border-mf-black transition-colors"
-                >
-                  {Object.entries(PHONE_RULES).map(([pref, rule]) => (
-                    <option key={pref} value={pref}>
-                      {rule.flag} {pref}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="cellphone"
-                  value={formData.cellphone}
-                  onChange={handleChange}
-                  className={`input-mf ${errors.cellphone ? 'border-mf-red' : ''}`}
-                  placeholder={PHONE_RULES[formData.phonePrefix]?.placeholder || "1234567890"}
-                />
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="sm:col-span-2">
+                <InputGroup label="Full Name" name="name" placeholder="John Doe" formData={formData} handleChange={handleChange} errors={errors} />
               </div>
-              {errors.cellphone && (
-                <p className="text-[10px] text-mf-red font-bold uppercase tracking-tighter">{errors.cellphone}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Address Section */}
-          <div className="pt-8 border-t border-gray-100">
-            <div className="flex justify-between items-end mb-8">
-              <h3 className="text-sm font-black uppercase tracking-widest text-mf-black">Shipping Address</h3>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-mf-red bg-mf-red/5 px-2 py-1">
-                🇨🇴 Colombia Only
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
-              <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
-              <div className="md:col-span-2">
-                <InputGroup label="Street Address / Details" name="addressDetails" placeholder="Avenue 123 #45-67" formData={formData} handleChange={handleChange} errors={errors} />
+              <InputGroup label="Email" name="email" type="email" placeholder="john@quinto.com" formData={formData} handleChange={handleChange} errors={errors} />
+              
+              <div className="space-y-2">
+                <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-quinto-600">Cellphone</label>
+                <div className="flex">
+                  <select name="phonePrefix" value={formData.phonePrefix} onChange={handleChange} className="quinto-input !py-3 !px-3 !w-24 rounded-r-none bg-quinto-50 border-r-0 text-quinto-900 font-bold">
+                    {Object.entries(PHONE_RULES).map(([pref, rule]) => (
+                      <option key={pref} value={pref}>{rule.flag} {pref}</option>
+                    ))}
+                  </select>
+                  <input type="text" name="cellphone" value={formData.cellphone} onChange={handleChange} className="quinto-input rounded-l-none" placeholder={PHONE_RULES[formData.phonePrefix]?.placeholder} />
+                </div>
+                {errors.cellphone && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">{errors.cellphone}</p>}
               </div>
             </div>
-          </div>
 
-          {/* Security Section */}
-          <div className="pt-8 border-t border-gray-100">
-            <h3 className="text-sm font-black uppercase tracking-widest text-mf-black mb-8">Security</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="pt-8 border-t border-quinto-50">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900">Delivery (Colombia)</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
+                <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
+                <div className="col-span-2">
+                  <InputGroup label="Address Details" name="addressDetails" placeholder="Calle 100 # 15 - 20" formData={formData} handleChange={handleChange} errors={errors} />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-8 border-t border-quinto-50 grid grid-cols-2 gap-6">
               <InputGroup label="Password" name="password" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
-              <InputGroup label="Confirm Password" name="confirmPassword" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
+              <InputGroup label="Confirm" name="confirmPassword" type="password" placeholder="••••••••" formData={formData} handleChange={handleChange} errors={errors} />
             </div>
-          </div>
 
-          <button 
-            type="submit" 
-            disabled={loading}
-            className={`w-full btn-mf py-5 flex items-center justify-center gap-3 ${loading ? 'opacity-50' : ''}`}
-          >
-            {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : 'Register Now'}
-          </button>
-        </form>
+            <button type="submit" disabled={loading} className="w-full quinto-btn-primary py-4">
+              {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : 'REGISTER NOW'}
+            </button>
+          </form>
 
-        <div className="mt-12 text-center pt-8 border-t border-gray-100">
-          <p className="text-sm text-mf-dark-gray">Already have an account? <Link to="/login" className="text-mf-black font-black uppercase tracking-widest border-b-2 border-mf-black hover:text-mf-red hover:border-mf-red transition-all">Login</Link></p>
+          <p className="mt-8 text-center text-xs text-quinto-400 font-bold uppercase tracking-widest">
+            Already have an account? <Link to="/login" className="text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all ml-1">Login</Link>
+          </p>
         </div>
       </div>
     </div>
