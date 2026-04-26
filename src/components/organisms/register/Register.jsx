@@ -3,13 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { registerFullUser } from "../../../firebase/auth";
 import axios from 'axios';
 
-// Phone validation rules by prefix
+// Phone validation rules by prefix with flags
 const PHONE_RULES = {
-  '+57': { regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)' },
-  '+1': { regex: /^[0-9]{10}$/, label: '10 digits' },
-  '+34': { regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)' },
-  '+52': { regex: /^[0-9]{10}$/, label: '10 dígitos' },
-  '+54': { regex: /^[0-9]{10}$/, label: '10 dígitos' },
+  '+57': { flag: '🇨🇴', regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)' },
+  '+1': { flag: '🇺🇸', regex: /^[0-9]{10}$/, label: '10 digits' },
+  '+34': { flag: '🇪🇸', regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)' },
+  '+52': { flag: '🇲🇽', regex: /^[0-9]{10}$/, label: '10 dígitos' },
+  '+54': { flag: '🇦🇷', regex: /^[0-9]{10}$/, label: '10 dígitos' },
 };
 
 const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors, prefix = null }) => (
@@ -244,10 +244,12 @@ const Register = () => {
                   name="phonePrefix" 
                   value={formData.phonePrefix} 
                   onChange={handleChange} 
-                  className="bg-mf-gray border-2 border-r-0 border-mf-gray text-xs font-bold px-2 outline-none focus:border-mf-black transition-colors"
+                  className="bg-mf-gray border-2 border-r-0 border-mf-gray text-sm font-bold px-3 outline-none focus:border-mf-black transition-colors"
                 >
-                  {Object.keys(PHONE_RULES).map(pref => (
-                    <option key={pref} value={pref}>{pref}</option>
+                  {Object.entries(PHONE_RULES).map(([pref, rule]) => (
+                    <option key={pref} value={pref}>
+                      {rule.flag} {pref}
+                    </option>
                   ))}
                 </select>
                 <input
