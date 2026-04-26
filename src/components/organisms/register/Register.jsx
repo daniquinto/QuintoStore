@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
-import { registerFullUser } from "../../../firebase/auth"
-import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -30,11 +28,11 @@ const Register = () => {
       return;
     }
 
-    /*
     // Validar email único
-    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const allUsers = [...MOCK_USERS, ...existingUsers];
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const allUsers = [...MOCK_USERS, ...registeredUsers];
     const emailExists = allUsers.some(user => user.email === formData.email);
+    
     if (emailExists) {
       setError('El email ya está registrado.');
       return;
@@ -42,7 +40,7 @@ const Register = () => {
 
     // Crear nuevo usuario
     const newUser = {
-      id: Date.now(), // ID único basado en timestamp
+      id: Date.now(),
       name: formData.name,
       email: formData.email,
       cellphone: formData.cellphone,
@@ -51,20 +49,11 @@ const Register = () => {
     };
 
     // Guardar en localStorage
-    existingUsers.push(newUser);
-    localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+    registeredUsers.push(newUser);
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
 
     // Navegar a login
     navigate('/login');
-    */
-
-    const respuesta = await registerFullUser(formData);
-
-    if (respuesta.success) {
-      navigate('/login');
-    } else {
-      setError(respuesta.error);
-    }
   };
 
   return (

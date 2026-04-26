@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProductById } from '../../../firebase/products';
+import useProductStore from '../../../store/productStore';
 import { imageMap } from '../../../assets/imageMap';
 import useCartStore from '../../../store/cartStore';
 
@@ -12,14 +12,16 @@ export default function ProductDetail() {
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
 
+    const products = useProductStore((state) => state.products);
     const addItem = useCartStore((state) => state.addItem);
 
     useEffect(() => {
-        getProductById(id).then((data) => {
-            setProduct(data);
-            setLoading(false);
-        });
-    }, [id]);
+        const foundProduct = products.find(p => p.id.toString() === id);
+        if (foundProduct) {
+            setProduct(foundProduct);
+        }
+        setLoading(false);
+    }, [id, products]);
 
     const handleAddToCart = () => {
         addItem(product, quantity);

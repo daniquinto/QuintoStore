@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import smile from "../../../assets/smile.png";
 import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
-import { loginUser } from "../../../firebase/auth";
+import useUserStore from '../../../store/userStore';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,37 +11,26 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const login = useUserStore(state => state.login);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    /*
     // Obtener usuarios registrados
     const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
     const allUsers = [...MOCK_USERS, ...registeredUsers];
 
     // Buscar usuario
     const user = allUsers.find(u => u.email === formData.email && u.password === formData.password);
+    
     if (user) {
       // Login exitoso
-      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      login(user);
       navigate('/gallery');
     } else {
-      setError('Credenciales incorrectas.');
+      setError('Correo o contraseña incorrectos.');
     }
-      */
-    const result = await loginUser(formData.email, formData.password);
-    if (result.success) {
-      navigate('/gallery');
-    } else {
-      setError(result.error);
-    }
-  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
       <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-sm border border-gray-100">

@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { subscribeToAuthChanges } from '../../../firebase/auth';
+import useProductStore from '../../../store/productStore';
+import useCartStore from '../../../store/cartStore';
 
 export default function Header() {
   const location = useLocation();
@@ -18,6 +20,9 @@ export default function Header() {
 
     return () => unsubscribe();
   }, []);
+
+  const { searchTerm, setSearchTerm } = useProductStore();
+  const totalItems = useCartStore(state => state.getTotalItems());
 
   const isActive = (path) => location.pathname === path;
 
@@ -43,6 +48,22 @@ export default function Header() {
               MyStore
             </span>
           </Link>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md mx-8 hidden sm:block">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-gray-100 border-none rounded-full py-2 px-10 focus:ring-2 focus:ring-brand-blue/50 focus:bg-white transition-all outline-none"
+              />
+              <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
 
           {/* Navigation Links */}
           <ul className="hidden md:flex items-center space-x-8">
@@ -100,6 +121,18 @@ export default function Header() {
               </>
             )}
           </ul>
+
+          {/* Cart Icon */}
+          <Link to="/cart" className="relative p-2 text-gray-600 hover:text-brand-blue transition-colors ml-4">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm">
+                {totalItems}
+              </span>
+            )}
+          </Link>
 
           {/* Mobile Menu Button (opcional para futuro) */}
           <button className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-50">
