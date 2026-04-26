@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useProductStore from '../../../store/productStore';
 import ProductCard from '../../molecules/ProductCard';
 
 const Home = () => {
-  const { products, fetchProducts, loading } = useProductStore();
+  const navigate = useNavigate();
+  const { products, fetchProducts, setSelectedCategory } = useProductStore();
 
   useEffect(() => {
     fetchProducts();
@@ -16,15 +17,20 @@ const Home = () => {
     .slice(0, 4);
 
   const categories = [
-    { name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=500&auto=format&fit=crop", path: "/gallery", color: "bg-quinto-100" },
-    { name: "Jewelry", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce33e?q=80&w=500&auto=format&fit=crop", path: "/gallery", color: "bg-quinto-200" },
-    { name: "Men's Fashion", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=500&auto=format&fit=crop", path: "/gallery", color: "bg-quinto-300" },
-    { name: "Women's Fashion", image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=500&auto=format&fit=crop", path: "/gallery", color: "bg-quinto-400" },
+    { name: "Electronics", slug: "electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=500&auto=format&fit=crop" },
+    { name: "Jewelry", slug: "jewelry", image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce33e?q=80&w=500&auto=format&fit=crop" },
+    { name: "Men's Fashion", slug: "men's clothing", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=500&auto=format&fit=crop" },
+    { name: "Women's Fashion", slug: "women's clothing", image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=500&auto=format&fit=crop" },
   ];
+
+  const handleCategoryClick = (slug) => {
+    setSelectedCategory(slug);
+    navigate('/gallery');
+  };
 
   return (
     <div className="bg-white">
-      {/* Hero Section - Bold & Immersive */}
+      {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center overflow-hidden bg-quinto-950">
         <div className="absolute inset-0 z-0">
           <img 
@@ -37,7 +43,7 @@ const Home = () => {
         
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
           <div className="max-w-2xl">
-            <span className="text-quinto-400 font-black uppercase tracking-[0.4em] mb-6 block animate-fade-in">Limited Edition 2026</span>
+            <span className="text-quinto-400 font-black uppercase tracking-[0.4em] mb-6 block">Limited Edition 2026</span>
             <h1 className="text-7xl md:text-8xl font-black text-white tracking-tighter leading-[0.85] mb-8">
               UNCOMPROMISED <span className="text-quinto-500">QUALITY</span> FOR YOU.
             </h1>
@@ -51,15 +57,12 @@ const Home = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
-              <button className="quinto-btn-outline !border-white !text-white hover:!bg-white hover:!text-quinto-950">
-                Our Story
-              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Icons - High Contrast */}
+      {/* Feature Icons */}
       <section className="bg-quinto-900 py-12 border-y border-quinto-800">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
@@ -81,7 +84,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories Showcase - Creative Grid */}
+      {/* Categories Showcase */}
       <section className="max-w-7xl mx-auto px-6 py-24">
         <div className="mb-16">
           <h2 className="text-4xl font-black text-quinto-950 tracking-tighter uppercase">Browse Categories</h2>
@@ -90,10 +93,10 @@ const Home = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[600px]">
           {categories.map((cat, i) => (
-            <Link 
-              to={cat.path} 
+            <div 
               key={i} 
-              className={`group relative overflow-hidden rounded-[2rem] ${i === 0 || i === 3 ? 'md:col-span-2' : ''} transition-all duration-700 hover:shadow-2xl hover:shadow-quinto-900/20`}
+              onClick={() => handleCategoryClick(cat.slug)}
+              className={`group relative overflow-hidden rounded-[2rem] cursor-pointer ${i === 0 || i === 3 ? 'md:col-span-2' : ''} transition-all duration-700 hover:shadow-2xl hover:shadow-quinto-900/20`}
             >
               <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-quinto-950 via-transparent to-transparent opacity-80"></div>
@@ -103,7 +106,7 @@ const Home = () => {
                   Shop Now
                 </span>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </section>
@@ -116,7 +119,7 @@ const Home = () => {
               <h2 className="text-4xl font-black text-quinto-950 tracking-tighter uppercase">Best Sellers</h2>
               <p className="text-xs font-bold text-quinto-600 uppercase tracking-widest mt-2">The most loved pieces in our store</p>
             </div>
-            <Link to="/gallery" className="text-xs font-black uppercase tracking-[0.2em] text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all">
+            <Link to="/gallery" onClick={() => setSelectedCategory('')} className="text-xs font-black uppercase tracking-[0.2em] text-quinto-900 border-b-2 border-quinto-500 hover:text-quinto-500 transition-all">
               View All Collection
             </Link>
           </div>
@@ -125,31 +128,6 @@ const Home = () => {
             {bestSellers.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Promo Banner - Creative CTA */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
-        <div className="relative rounded-[3rem] bg-quinto-900 p-16 overflow-hidden flex flex-col md:flex-row items-center justify-between gap-12">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-quinto-400 blur-[100px] opacity-20"></div>
-          <div className="relative z-10 text-center md:text-left">
-            <h2 className="text-5xl font-black text-white tracking-tighter leading-none mb-6 uppercase">
-              Join the Quinto<br />Elite Club
-            </h2>
-            <p className="text-quinto-300 font-bold uppercase tracking-widest text-xs mb-10 max-w-sm">
-              Get exclusive access to pre-launches, limited editions and special discounts.
-            </p>
-            <div className="flex gap-4 justify-center md:justify-start">
-               <input type="email" placeholder="Email Address" className="bg-white/10 border-2 border-white/20 rounded-2xl px-6 py-3 text-white outline-none focus:border-quinto-400 w-64 transition-all" />
-               <button className="bg-white text-quinto-950 font-black px-8 py-3 rounded-2xl hover:bg-quinto-400 transition-colors uppercase tracking-widest text-xs">Join</button>
-            </div>
-          </div>
-          <div className="relative z-10 group">
-             <div className="w-64 h-64 bg-quinto-400 rounded-full flex items-center justify-center p-8 rotate-12 group-hover:rotate-0 transition-transform duration-700">
-               <span className="text-quinto-950 font-black text-8xl italic">20%</span>
-             </div>
-             <p className="text-center mt-4 text-white font-black uppercase tracking-[0.4em] text-xs">First Purchase</p>
           </div>
         </div>
       </section>
@@ -172,7 +150,7 @@ const Home = () => {
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-quinto-500 mb-8">Menu</h4>
             <ul className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-60">
               <li><Link to="/" className="hover:text-quinto-500">Home</Link></li>
-              <li><Link to="/gallery" className="hover:text-quinto-500">Shop</Link></li>
+              <li><Link to="/gallery" onClick={() => setSelectedCategory('')} className="hover:text-quinto-500">Shop</Link></li>
               <li><Link to="/profile" className="hover:text-quinto-500">My Account</Link></li>
             </ul>
           </div>

@@ -8,6 +8,7 @@ export const useProductStore = create(
       products: [],
       filteredProducts: [],
       searchTerm: '',
+      selectedCategory: '',
       loading: false,
       error: null,
 
@@ -15,35 +16,58 @@ export const useProductStore = create(
         set({ loading: true, error: null });
         try {
           const response = await axios.get('https://fakestoreapi.com/products');
-          // Normalize data: ensure we have both 'name' (used in search) and 'title' (original)
           const normalizedProducts = response.data.map(p => ({
             ...p,
-            name: p.title // Add name field for compatibility with our search logic
+            name: p.title 
           }));
           set({ 
             products: normalizedProducts, 
-            filteredProducts: normalizedProducts, 
             loading: false 
           });
+          get().applyFilters(); // Apply filters once products are fetched
         } catch (error) {
           set({ error: 'Error al cargar productos de la API', loading: false });
           console.error(error);
         }
       },
 
-      setSearchTerm: (term) => set((state) => {
-        const searchTerm = term.toLowerCase();
-        const filteredProducts = state.products.filter(product => 
-          (product.name || product.title).toLowerCase().includes(searchTerm) || 
-          product.description.toLowerCase().includes(searchTerm)
-        );
-        return { searchTerm: term, filteredProducts };
-      }),
+      setSearchTerm: (term) => {
+        set({ searchTerm: term });
+        get().applyFilters();
+      },
 
-      resetFilters: () => set((state) => ({
-        searchTerm: '',
-        filteredProducts: state.products
-      }))
+      setSelectedCategory: (category) => {
+        set({ selectedCategory: category });
+        get().applyFilters();
+      },
+
+      applyFilters: () => {
+        const { products, searchTerm, selectedCategory } = get();
+        let filtered = [...products];
+
+        if (selectedCategory) {
+          filtered = filtered.filter(p => p.category === selectedCategory);
+        }
+
+        if (searchTerm) {
+          const lowerTerm = searchTerm.toLowerCase();
+          filtered = filtered.filter(product => 
+            (product.name || product.title).toLowerCase().includes(lowerTerm) || 
+            product.description.toLowerCase().includes(lowerTerm)
+          );
+        }
+
+        set({ filteredProducts: filtered });
+      },
+
+      resetFilters: () => {
+        const { products } = get();
+        set({
+          searchTerm: '',
+          selectedCategory: '',
+          filteredProducts: products
+        });
+      }
     }),
     {
       name: 'product-storage',
