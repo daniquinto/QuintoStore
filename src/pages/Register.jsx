@@ -5,11 +5,11 @@ import axios from 'axios';
 
 // Phone validation rules by prefix with flags and placeholders
 const PHONE_RULES = {
-  '+57': { flag: '🇨🇴', regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)', placeholder: '3001234567' },
+  '+57': { flag: '🇨🇴', regex: /^3[0-9]{9}$/, label: '10 digits (starts with 3)', placeholder: '3001234567' },
   '+1': { flag: '🇺🇸', regex: /^[0-9]{10}$/, label: '10 digits', placeholder: '2025550123' },
-  '+34': { flag: '🇪🇸', regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)', placeholder: '612345678' },
-  '+52': { flag: '🇲🇽', regex: /^[0-9]{10}$/, label: '10 dígitos', placeholder: '5512345678' },
-  '+54': { flag: '🇦🇷', regex: /^[0-9]{10}$/, label: '10 dígitos', placeholder: '1112345678' },
+  '+34': { flag: '🇪🇸', regex: /^[67][0-9]{8}$/, label: '9 digits (starts with 6 or 7)', placeholder: '612345678' },
+  '+52': { flag: '🇲🇽', regex: /^[0-9]{10}$/, label: '10 digits', placeholder: '5512345678' },
+  '+54': { flag: '🇦🇷', regex: /^[0-9]{10}$/, label: '10 digits', placeholder: '1112345678' },
 };
 
 const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors, prefix = null }) => (
@@ -201,7 +201,6 @@ const Register = () => {
   return (
     <div className="bg-quinto-50/30 min-h-screen py-24 flex items-center justify-center">
       <div className="max-w-2xl w-full mx-4 quinto-card p-12 bg-white relative overflow-hidden">
-        {/* Subtle Decorative Element */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-quinto-500/5 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
         
         <div className="relative z-10">
@@ -243,12 +242,12 @@ const Register = () => {
             </div>
 
             <div className="pt-8 border-t border-slate-100">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900 mb-6 text-center">Shipping (Colombia Only)</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-quinto-900 mb-6 text-center">Shipping (Colombia Support)</h3>
               <div className="grid grid-cols-2 gap-6">
                 <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
                 <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
                 <div className="col-span-2">
-                  <InputGroup label="Address Details" name="addressDetails" placeholder="Calle 100 # 15 - 20" formData={formData} handleChange={handleChange} errors={errors} />
+                  <InputGroup label="Address Details" name="addressDetails" placeholder="100 Street # 15 - 20" formData={formData} handleChange={handleChange} errors={errors} />
                 </div>
               </div>
             </div>

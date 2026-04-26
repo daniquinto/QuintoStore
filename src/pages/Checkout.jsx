@@ -115,7 +115,7 @@ const Checkout = () => {
           quantity: item.quantity
         })),
         total: getTotalPrice(),
-        paymentMethod: 'Contraentrega',
+        paymentMethod: 'Cash on Delivery',
         status: 'Confirmed',
         createdAt: new Date()
       });
@@ -138,7 +138,7 @@ const Checkout = () => {
           <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
         </div>
         <h2 className="text-4xl font-black text-quinto-900 uppercase tracking-tighter mb-4">Order Placed!</h2>
-        <p className="text-quinto-600 font-bold uppercase tracking-widest text-xs mb-8">Method: Contraentrega. Redirecting...</p>
+        <p className="text-quinto-600 font-bold uppercase tracking-widest text-xs mb-8">Method: Cash on Delivery. Redirecting...</p>
         <div className="w-64 h-1 bg-quinto-100 rounded-full overflow-hidden">
           <div className="h-full bg-quinto-900 animate-[loading_3s_ease-in-out]"></div>
         </div>
@@ -152,7 +152,7 @@ const Checkout = () => {
       <div className="bg-quinto-50/50 py-20 border-b border-quinto-100">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-5xl font-black text-quinto-900 uppercase tracking-tighter">Shipping Info</h1>
-          <p className="text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Contraentrega Worldwide Delivery</p>
+          <p className="text-xs font-bold text-quinto-500 uppercase tracking-widest mt-2">Cash on Delivery Worldwide Delivery</p>
         </div>
       </div>
 
@@ -229,7 +229,7 @@ const Checkout = () => {
                         type="text"
                         value={newAddrData.details}
                         onChange={(e) => setNewAddrData({...newAddrData, details: e.target.value})}
-                        placeholder="Calle 123 # 45 - 67, Apt 101"
+                        placeholder="123 Street # 45 - 67, Apt 101"
                         className="quinto-input !bg-white !text-sm"
                       />
                     </div>
@@ -284,7 +284,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-60">
                   <span>Method</span>
-                  <span className="text-quinto-400">Contraentrega</span>
+                  <span className="text-quinto-400">Cash on Delivery</span>
                 </div>
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                   <span className="text-sm font-black uppercase tracking-widest">Total</span>

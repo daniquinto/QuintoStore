@@ -5,7 +5,7 @@ import { doc, setDoc, getFirestore } from "firebase/firestore";
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Wrappers para la UI: ocultan la dependencia de 'firebase/auth' a los componentes
+// Wrappers for UI: hide firebase/auth dependency from components
 export const subscribeToAuthChanges = (callback) => {
     return onAuthStateChanged(auth, callback);
 };
@@ -22,7 +22,7 @@ export const logoutUser = async () => {
 
 export const registerFullUser = async (userData) => {
     try {
-        // 1. Crear el usuario en Auth
+        // 1. Create user in Auth
         const userCredential = await createUserWithEmailAndPassword(
             auth,
             userData.email,
@@ -31,19 +31,18 @@ export const registerFullUser = async (userData) => {
 
         const user = userCredential.user;
 
-        // 2. Guardar en Firestore usando el UID obtenido
-        // Ahora guardamos una lista de direcciones (addresses) en lugar de un string
+        // 2. Save in Firestore using the obtained UID
         await setDoc(doc(db, "users", user.uid), {
             name: userData.name,
             email: userData.email,
             cellphone: userData.cellphone,
-            addresses: [userData.address], // Initialize with the registration address
+            addresses: [userData.address], // Initialize with registration address
             createdAt: new Date()
         });
 
         return { success: true, user };
     } catch (error) {
-        console.error("Error en el servicio de registro:", error);
+        console.error("Registration service error:", error);
         return { success: false, error: error.code };
     }
 };
@@ -55,14 +54,16 @@ export const loginUser = async (email, password) => {
 
         return { success: true, user };
     } catch (error) {
-        console.error("Error en el servicio de login:", error.code);
+        console.error("Login service error:", error.code);
 
-        // Mapeo rápido de errores comunes de login
-        let errorMessage = "Error al iniciar sesión";
+        // Map common login errors to English
+        let errorMessage = "Login error";
         if (error.code === 'auth/invalid-credential') {
-            errorMessage = "Correo o contraseña incorrectos";
+            errorMessage = "Incorrect email or password";
         } else if (error.code === 'auth/user-not-found') {
-            errorMessage = "El usuario no existe";
+            errorMessage = "User does not exist";
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = "Network error. Please check your connection.";
         }
 
         return { success: false, error: errorMessage };
