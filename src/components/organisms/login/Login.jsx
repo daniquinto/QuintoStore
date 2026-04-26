@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import smile from "../../../assets/smile.png";
-import MOCK_USERS from "../../../mockdata/mock_users"
+import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
 import { loginUser } from "../../../firebase/auth";
 
 const Login = () => {

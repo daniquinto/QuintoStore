@@ -3,7 +3,7 @@ import ProductCard from "../../molecules/ProductCard";
 import { getProducts } from "../../../firebase/products";
 
 /* REFERENCIA: lógica original con mockdata
-import MOCK_PRODUCTS from "../../../mockdata/mock_products";
+import { mockProducts as MOCK_PRODUCTS } from "../../../mockdata/products";
 export function GalleryMock() {
     return (
         <section className="p-6">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import MOCK_USERS from "../../../mockdata/mock_users"
+import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
 import { registerFullUser } from "../../../firebase/auth"
 import axios from "axios";
 
