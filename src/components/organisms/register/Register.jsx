@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
+import { registerFullUser } from "../../../firebase/auth"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -28,32 +29,13 @@ const Register = () => {
       return;
     }
 
-    // Validar email único
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const allUsers = [...MOCK_USERS, ...registeredUsers];
-    const emailExists = allUsers.some(user => user.email === formData.email);
-    
-    if (emailExists) {
-      setError('El email ya está registrado.');
-      return;
+    const respuesta = await registerFullUser(formData);
+
+    if (respuesta.success) {
+      navigate('/login');
+    } else {
+      setError(respuesta.error);
     }
-
-    // Crear nuevo usuario
-    const newUser = {
-      id: Date.now(),
-      name: formData.name,
-      email: formData.email,
-      cellphone: formData.cellphone,
-      address: formData.address,
-      password: formData.password
-    };
-
-    // Guardar en localStorage
-    registeredUsers.push(newUser);
-    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-
-    // Navegar a login
-    navigate('/login');
   };
 
   return (

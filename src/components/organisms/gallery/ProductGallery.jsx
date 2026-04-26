@@ -1,23 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../../molecules/ProductCard";
-import { mockProducts } from "../../../mockdata/products";
 import useProductStore from "../../../store/productStore";
-import { useState } from "react";
 
 const ITEMS_PER_PAGE = 8;
-  const { filteredProducts, setProducts } = useProductStore();
+
+const ProductGallery = () => {
+  const { filteredProducts, fetchProducts, loading, error } = useProductStore();
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    // Initializing store with mockdata
-    setProducts(mockProducts);
-  }, [setProducts]);
-
-  const [currentPage, setCurrentPage] = useState(1);
+    fetchProducts();
+  }, [fetchProducts]);
 
   // Reset page when filtering
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredProducts.length]);
+
+  if (loading && filteredProducts.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-500 font-medium">
+        {error}
+      </div>
+    );
+  }
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -77,7 +91,7 @@ const ITEMS_PER_PAGE = 8;
         </div>
       )}
       
-      {filteredProducts.length === 0 && (
+      {filteredProducts.length === 0 && !loading && (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <svg className="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

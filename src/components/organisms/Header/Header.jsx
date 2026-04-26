@@ -4,9 +4,11 @@ import { subscribeToAuthChanges } from '../../../firebase/auth';
 import useProductStore from '../../../store/productStore';
 import useCartStore from '../../../store/cartStore';
 
+import useUserStore from '../../../store/userStore';
+
 export default function Header() {
   const location = useLocation();
-  const [loggedInUser, setLoggedInUser] = useState(null);
+  const { user: loggedInUser, login, logout: clearUserStore } = useUserStore();
 
   useEffect(() => {
     /*
@@ -15,7 +17,11 @@ export default function Header() {
       // setLoggedInUser(user);
     */
     const unsubscribe = subscribeToAuthChanges((currentUser) => {
-      setLoggedInUser(currentUser);
+      if (currentUser) {
+        login(currentUser);
+      } else {
+        clearUserStore();
+      }
     });
 
     return () => unsubscribe();

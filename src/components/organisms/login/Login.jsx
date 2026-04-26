@@ -3,6 +3,7 @@ import { useState } from 'react';
 import smile from "../../../assets/smile.png";
 import { mockUsers as MOCK_USERS } from "../../../mockdata/users"
 import useUserStore from '../../../store/userStore';
+import { loginUser } from '../../../firebase/auth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,19 +18,13 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-    // Obtener usuarios registrados
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const allUsers = [...MOCK_USERS, ...registeredUsers];
-
-    // Buscar usuario
-    const user = allUsers.find(u => u.email === formData.email && u.password === formData.password);
+    const result = await loginUser(formData.email, formData.password);
     
-    if (user) {
-      // Login exitoso
-      login(user);
+    if (result.success) {
+      // Nota: El userStore se actualizará mediante el suscriptor en el Layout/Header
       navigate('/gallery');
     } else {
-      setError('Correo o contraseña incorrectos.');
+      setError(result.error);
     }
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
