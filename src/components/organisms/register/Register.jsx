@@ -3,32 +3,48 @@ import { useNavigate, Link } from 'react-router-dom';
 import { registerFullUser } from "../../../firebase/auth";
 import axios from 'axios';
 
-const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors }) => (
+// Phone validation rules by prefix
+const PHONE_RULES = {
+  '+57': { regex: /^3[0-9]{9}$/, label: '10 dígitos (empieza por 3)' },
+  '+1': { regex: /^[0-9]{10}$/, label: '10 digits' },
+  '+34': { regex: /^[67][0-9]{8}$/, label: '9 dígitos (empieza por 6 o 7)' },
+  '+52': { regex: /^[0-9]{10}$/, label: '10 dígitos' },
+  '+54': { regex: /^[0-9]{10}$/, label: '10 dígitos' },
+};
+
+const InputGroup = ({ label, name, type = "text", placeholder, options = null, formData, handleChange, errors, prefix = null }) => (
   <div className="space-y-1">
     <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black">
       {label}
     </label>
-    {options ? (
-      <select
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        disabled={name === 'city' && !formData.department}
-        className={`input-mf appearance-none bg-white ${errors[name] ? 'border-mf-red' : ''}`}
-      >
-        <option value="">Select {label}</option>
-        {options.map(opt => <option key={opt.id || opt.name || opt} value={opt.name || opt}>{opt.name || opt}</option>)}
-      </select>
-    ) : (
-      <input
-        type={type}
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        className={`input-mf ${errors[name] ? 'border-mf-red' : ''}`}
-        placeholder={placeholder}
-      />
-    )}
+    <div className="relative flex">
+      {prefix && (
+        <span className="flex items-center px-4 bg-mf-gray border-2 border-r-0 border-mf-gray text-xs font-bold text-mf-black">
+          {prefix}
+        </span>
+      )}
+      {options ? (
+        <select
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          disabled={name === 'city' && !formData.department}
+          className={`input-mf appearance-none bg-white ${errors[name] ? 'border-mf-red' : ''}`}
+        >
+          <option value="">Select {label}</option>
+          {options.map(opt => <option key={opt.id || opt.name || opt} value={opt.name || opt}>{opt.name || opt}</option>)}
+        </select>
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          className={`input-mf ${errors[name] ? 'border-mf-red' : ''} ${prefix ? 'rounded-l-none' : ''}`}
+          placeholder={placeholder}
+        />
+      )}
+    </div>
     {errors[name] && (
       <p className="text-[10px] text-mf-red font-bold uppercase tracking-tighter">{errors[name]}</p>
     )}
@@ -41,6 +57,7 @@ const Register = () => {
     name: '',
     email: '',
     cellphone: '',
+    phonePrefix: '+57',
     department: '',
     city: '',
     addressDetails: '',
@@ -52,7 +69,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
   
-  // States for API data
   const [departments, setDepartments] = useState([]);
   const [allCities, setAllCities] = useState([]);
   const [filteredCities, setFilteredCities] = useState([]);
@@ -87,8 +103,7 @@ const Register = () => {
     }
   }, [formData.department, departments, allCities]);
 
-  // Dynamic Validation Function
-  const validateField = (name, value) => {
+  const validateField = (name, value, currentPrefix = formData.phonePrefix) => {
     let error = '';
     switch (name) {
       case 'name':
@@ -98,10 +113,15 @@ const Register = () => {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Email inválido.';
         break;
       case 'cellphone':
-        if (!/^3[0-9]{9}$/.test(value)) error = 'Debe ser de 10 dígitos y empezar por 3.';
+        const rule = PHONE_RULES[currentPrefix];
+        if (rule && !rule.regex.test(value)) {
+          error = `Formato inválido para ${currentPrefix}. Req: ${rule.label}`;
+        }
         break;
       case 'password':
-        if (value.length < 6) error = 'Mínimo 6 caracteres.';
+        if (value.length < 8) error = 'Mínimo 8 caracteres.';
+        else if (!/[A-Z]/.test(value)) error = 'Al menos una mayúscula.';
+        else if (!/[0-9]/.test(value)) error = 'Al menos un número.';
         break;
       case 'confirmPassword':
         if (value !== formData.password) error = 'Las contraseñas no coinciden.';
@@ -113,7 +133,7 @@ const Register = () => {
         if (!value) error = 'Selecciona una ciudad.';
         break;
       case 'addressDetails':
-        if (!value.trim()) error = 'Ingresa los detalles de tu dirección.';
+        if (!value.trim()) error = 'Ingresa los detalles.';
         break;
       default:
         break;
@@ -127,29 +147,36 @@ const Register = () => {
     let newValue = value;
 
     if (name === 'cellphone') {
-      newValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+      newValue = value.replace(/[^0-9]/g, '');
     }
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: newValue,
-      ...(name === 'department' ? { city: '' } : {})
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: newValue,
+        ...(name === 'department' ? { city: '' } : {})
+      };
+      
+      // Dynamic validation
+      validateField(name, newValue, updated.phonePrefix);
+      
+      if (name === 'password') {
+        validateField('confirmPassword', updated.confirmPassword, updated.phonePrefix);
+      }
 
-    // Trigger dynamic validation
-    validateField(name, newValue);
-    
-    // Special case: if password changes, re-validate confirmPassword
-    if (name === 'password') {
-      validateField('confirmPassword', formData.confirmPassword);
-    }
+      // If prefix changes, re-validate cellphone
+      if (name === 'phonePrefix') {
+        validateField('cellphone', updated.cellphone, newValue);
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
     
-    // Validate all fields before submission
     const formErrors = {};
     Object.keys(formData).forEach(key => {
       const error = validateField(key, formData[key]);
@@ -165,7 +192,8 @@ const Register = () => {
     setLoading(true);
     try {
       const fullAddress = `${formData.addressDetails}, ${formData.city}, ${formData.department}, Colombia`;
-      const submissionData = { ...formData, address: fullAddress };
+      const fullPhone = `${formData.phonePrefix} ${formData.cellphone}`;
+      const submissionData = { ...formData, address: fullAddress, cellphone: fullPhone };
       const respuesta = await registerFullUser(submissionData);
       if (respuesta.success) {
         navigate('/login');
@@ -208,12 +236,43 @@ const Register = () => {
               <InputGroup label="Full Name" name="name" placeholder="John Doe" formData={formData} handleChange={handleChange} errors={errors} />
             </div>
             <InputGroup label="Email Address" name="email" type="email" placeholder="email@example.com" formData={formData} handleChange={handleChange} errors={errors} />
-            <InputGroup label="Cellphone" name="cellphone" placeholder="3001234567" formData={formData} handleChange={handleChange} errors={errors} />
+            
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold uppercase tracking-widest text-mf-black">Cellphone</label>
+              <div className="flex">
+                <select 
+                  name="phonePrefix" 
+                  value={formData.phonePrefix} 
+                  onChange={handleChange} 
+                  className="bg-mf-gray border-2 border-r-0 border-mf-gray text-xs font-bold px-2 outline-none focus:border-mf-black transition-colors"
+                >
+                  {Object.keys(PHONE_RULES).map(pref => (
+                    <option key={pref} value={pref}>{pref}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  name="cellphone"
+                  value={formData.cellphone}
+                  onChange={handleChange}
+                  className={`input-mf ${errors.cellphone ? 'border-mf-red' : ''}`}
+                  placeholder="3001234567"
+                />
+              </div>
+              {errors.cellphone && (
+                <p className="text-[10px] text-mf-red font-bold uppercase tracking-tighter">{errors.cellphone}</p>
+              )}
+            </div>
           </div>
 
           {/* Address Section */}
           <div className="pt-8 border-t border-gray-100">
-            <h3 className="text-sm font-black uppercase tracking-widest text-mf-black mb-8">Shipping Address</h3>
+            <div className="flex justify-between items-end mb-8">
+              <h3 className="text-sm font-black uppercase tracking-widest text-mf-black">Shipping Address</h3>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-mf-red bg-mf-red/5 px-2 py-1">
+                🇨🇴 Colombia Only
+              </span>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <InputGroup label="Department" name="department" options={departments} formData={formData} handleChange={handleChange} errors={errors} />
               <InputGroup label="City" name="city" options={filteredCities} formData={formData} handleChange={handleChange} errors={errors} />
